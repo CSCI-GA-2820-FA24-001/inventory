@@ -23,7 +23,7 @@ and Delete YourResourceModel
 
 from flask import jsonify, request, url_for, abort
 from flask import current_app as app  # Import Flask application
-from service.models import YourResourceModel
+from service.models import Inventory, DataValidationError
 from service.common import status  # HTTP Status Codes
 
 
@@ -44,3 +44,22 @@ def index():
 ######################################################################
 
 # Todo: Place your REST API code here ...
+@app.route('/inventory', methods=['POST'])
+def create_inventory():
+    return jsonify({'error': "NOT IMPLEMENTED"}), 400
+
+@app.route('/inventory', methods=['GET'])
+def list_inventory():
+    return jsonify({'error': "NOT IMPLEMENTED"}), 400
+
+@app.route('/inventory/<int:id>', methods=['GET'])
+def get_inventory(id):
+    return jsonify({'error': "NOT IMPLEMENTED"}), 400
+
+@app.route('/inventory/<int:id>', methods=['PUT'])
+def update_inventory(id):
+    return jsonify({'error': "NOT IMPLEMENTED"}), 400
+
+@app.route('/inventory/<int:id>', methods=['DELETE'])
+def delete_inventory(id):
+    return jsonify({'error': "NOT IMPLEMENTED"}), 400
