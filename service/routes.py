@@ -26,7 +26,6 @@ from flask import current_app as app  # Import Flask application
 from service.models import Inventory, DataValidationError
 from service.common import status  # HTTP Status Codes
 
-
 ######################################################################
 # GET INDEX
 ######################################################################
@@ -54,7 +53,9 @@ def list_inventory():
 
 @app.route('/inventory/<int:id>', methods=['GET'])
 def get_inventory(id):
-    return jsonify({'error': "NOT IMPLEMENTED"}), 400
+    item = Inventory.query.get_or_404(id)
+    return jsonify(item.serialize(), 200)
+
 
 @app.route('/inventory/<int:id>', methods=['PUT'])
 def update_inventory(id):
