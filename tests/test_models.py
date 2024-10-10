@@ -23,7 +23,7 @@ import os
 import logging
 from unittest import TestCase
 from wsgi import app
-from service.models import YourResourceModel, DataValidationError, db
+from service.models import Inventory, DataValidationError, db
 from .factories import YourResourceModelFactory
 
 DATABASE_URI = os.getenv(
@@ -54,7 +54,7 @@ class TestYourResourceModel(TestCase):
 
     def setUp(self):
         """This runs before each test"""
-        db.session.query(YourResourceModel).delete()  # clean up the last tests
+        db.session.query(Inventory).delete()  # clean up the last tests
         db.session.commit()
 
     def tearDown(self):
@@ -71,9 +71,9 @@ class TestYourResourceModel(TestCase):
         resource = YourResourceModelFactory()
         resource.create()
         self.assertIsNotNone(resource.id)
-        found = YourResourceModel.all()
+        found = Inventory.all()
         self.assertEqual(len(found), 1)
-        data = YourResourceModel.find(resource.id)
+        data = Inventory.find(resource.id)
         self.assertEqual(data.name, resource.name)
 
     # Todo: Add your test cases here...
