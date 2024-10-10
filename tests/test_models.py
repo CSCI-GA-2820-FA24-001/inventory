@@ -69,7 +69,7 @@ class TestInventory(TestCase):
 
     # Todo: Add your test cases here...
     def test_inventory_factory(self):
-        """It should create a YourResourceModel"""
+        """It should create a Inventory"""
         resource = InventoryFactory()
         resource.create()
         self.assertIsNotNone(resource.id)
