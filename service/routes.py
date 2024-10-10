@@ -62,4 +62,16 @@ def update_inventory(id):
 
 @app.route('/inventory/<int:id>', methods=['DELETE'])
 def delete_inventory(id):
-    return jsonify({'error': "NOT IMPLEMENTED"}), 400
+    app.logger.info(f"delete inventory with id: {id}")
+    inventory = Inventory.find(id) 
+    if inventory is None:
+        app.logger.error(f"Inventory with id {id} not found.")
+        return jsonify({"error": "Inventory not found"}), status.HTTP_404_NOT_FOUND
+
+    try:
+        inventory.delete()
+        app.logger.info(f"Inventory with id {id} has deleted successfully.")
+        return '', status.HTTP_204_NO_CONTENT
+    except DataValidationError as e:
+        app.logger.error(f"Error deleting inventory: {str(e)}")
+        return jsonify({"error": str(e)}), status.HTTP_400_BAD_REQUEST
