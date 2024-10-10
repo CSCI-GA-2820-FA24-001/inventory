@@ -7,7 +7,7 @@ import factory.fuzzy
 from service.models import Inventory
 
 
-class YourResourceModelFactory(factory.Factory):
+class InventoryFactory(factory.Factory):
     """Creates fake pets that you don't have to feed"""
 
     class Meta:  # pylint: disable=too-few-public-methods

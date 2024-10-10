@@ -15,7 +15,7 @@
 ######################################################################
 
 """
-TestYourResourceModel API Service Test Suite
+TestInventory API Service Test Suite
 """
 
 # pylint: disable=duplicate-code
@@ -35,7 +35,7 @@ DATABASE_URI = os.getenv(
 #  T E S T   C A S E S
 ######################################################################
 # pylint: disable=too-many-public-methods
-class TestYourResourceService(TestCase):
+class TestInventory(TestCase):
     """REST API Server Tests"""
 
     @classmethod
