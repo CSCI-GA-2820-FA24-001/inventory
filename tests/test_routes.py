@@ -40,6 +40,7 @@ BASE_URL = "/inventory"
 ######################################################################
 # pylint: disable=too-many-public-methods
 
+
 class TestInventoryService(TestCase):
     """REST API Server Tests"""
 
@@ -120,3 +121,24 @@ class TestInventoryService(TestCase):
         self.assertEqual(new_inventory["quantity"], test_inventory.quantity)
         self.assertEqual(new_inventory["condition"], test_inventory.condition)
         self.assertEqual(new_inventory["stock_level"], test_inventory.stock_level)
+
+    # TEST GET
+    def test_get_inventory(self):
+        """It should get an inventory item"""
+
+        created_inventory = self._create_inventory()[0]
+
+        logging.debug("Created inventory with id %s", created_inventory)
+        response = self.client.get(f"{BASE_URL}/{created_inventory.id}")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        data = response.get_json()
+        self.assertEqual(data["name"], created_inventory.name)
+        self.assertEqual(data["quantity"], created_inventory.quantity)
+        self.assertEqual(data["condition"], created_inventory.condition)
+        self.assertEqual(data["stock_level"], created_inventory.stock_level)
+
+    def test_get_inventory_not_found(self):
+        """It should not return an inventory that does not exist"""
+        response = self.client.get(f"{BASE_URL}/1")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
