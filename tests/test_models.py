@@ -23,7 +23,8 @@ import os
 import logging
 from unittest import TestCase
 from wsgi import app
-from service.models import Inventory, DataValidationError, db
+
+from service.models import Inventory, db
 from .factories import InventoryFactory
 
 DATABASE_URI = os.getenv(
@@ -66,7 +67,6 @@ class TestInventory(TestCase):
     ######################################################################
 
 
-
     # Todo: Add your test cases here...
     def test_inventory_factory(self):
         """It should create a Inventory"""
@@ -76,4 +76,8 @@ class TestInventory(TestCase):
         found = Inventory.all()
         self.assertEqual(len(found), 1)
         data = Inventory.find(resource.id)
+
         self.assertEqual(data.name, resource.name)
+
+        # Todo: Add your test cases here...
+

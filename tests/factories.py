@@ -3,12 +3,13 @@ Test Factory to make fake objects for testing
 """
 
 import factory
-import factory.fuzzy
+
+from factory.fuzzy import FuzzyChoice
 from service.models import Inventory
 
 
 class InventoryFactory(factory.Factory):
-    """Creates fake pets that you don't have to feed"""
+    """Creates fake inventory items"""
 
     class Meta:  # pylint: disable=too-few-public-methods
         """Maps factory to data model"""
@@ -16,9 +17,9 @@ class InventoryFactory(factory.Factory):
         model = Inventory
 
     id = factory.Sequence(lambda n: n)
-    name = factory.Faker("first_name")
 
-    # Todo: Add your other attributes here...
-    quantity =  factory.Faker('pyint', min_value = 0, max_value = 1000)
-    condition = factory.fuzzy.FuzzyChoice(choices=["New", "Refurbished", "Used"])
-    stock_level = factory.fuzzy.FuzzyChoice(choices=["In Stock", "Low"])
+    name = factory.Faker("name")
+    quantity = factory.Faker("random_int", min=0, max=10000)
+    condition = FuzzyChoice(choices=["NEW", "OPEN_BOX", "USED"])
+    stock_level = FuzzyChoice(choices=["LOW", "MEDIUM", "HIGH"])
+

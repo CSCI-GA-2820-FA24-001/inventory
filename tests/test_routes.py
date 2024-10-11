@@ -15,27 +15,32 @@
 ######################################################################
 
 """
-TestInventory API Service Test Suite
+TestInventoryModel API Service Test Suite
 """
 
 # pylint: disable=duplicate-code
+from service.models import db, Inventory
 import os
 import logging
 from unittest import TestCase
+from tests.factories import InventoryFactory
 from wsgi import app
 from service.common import status
-from service.models import db, Inventory
+
 
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql+psycopg://postgres:postgres@localhost:5432/testdb"
 )
+
+BASE_URL = "/inventory"
 
 
 ######################################################################
 #  T E S T   C A S E S
 ######################################################################
 # pylint: disable=too-many-public-methods
-class TestInventory(TestCase):
+
+class TestInventoryService(TestCase):
     """REST API Server Tests"""
 
     @classmethod
@@ -63,6 +68,22 @@ class TestInventory(TestCase):
         """This runs after each test"""
         db.session.remove()
 
+    def _create_inventory(self, count: int = 1) -> list:
+        """Factory method to create inventory in bulk"""
+        inventory = []
+        for _ in range(count):
+            test_inventory = InventoryFactory()
+            response = self.client.post(BASE_URL, json=test_inventory.serialize())
+            self.assertEqual(
+                response.status_code,
+                status.HTTP_201_CREATED,
+                "Could not create test inventory item",
+            )
+            new_inventory = response.get_json()
+            test_inventory.id = new_inventory["id"]
+            inventory.append(test_inventory)
+        return inventory
+
     ######################################################################
     #  P L A C E   T E S T   C A S E S   H E R E
     ######################################################################
@@ -72,4 +93,30 @@ class TestInventory(TestCase):
         resp = self.client.get("/")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
-    # Todo: Add your test cases here...
+    # TEST CREATE
+    def test_create_inventory(self):
+        """It should Create a new Inventory"""
+        test_inventory = InventoryFactory()
+        logging.debug("Test Inventory: %s", test_inventory.serialize())
+        response = self.client.post(BASE_URL, json=test_inventory.serialize())
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        # Make sure location header is set
+        location = response.headers.get("Location", None)
+        self.assertIsNotNone(location)
+
+        # Check the data is correct
+        new_inventory = response.get_json()
+        self.assertEqual(new_inventory["name"], test_inventory.name)
+        self.assertEqual(new_inventory["quantity"], test_inventory.quantity)
+        self.assertEqual(new_inventory["condition"], test_inventory.condition)
+        self.assertEqual(new_inventory["stock_level"], test_inventory.stock_level)
+
+        # Check that the location header was correct
+        response = self.client.get(location)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        new_inventory = response.get_json()
+        self.assertEqual(new_inventory["name"], test_inventory.name)
+        self.assertEqual(new_inventory["quantity"], test_inventory.quantity)
+        self.assertEqual(new_inventory["condition"], test_inventory.condition)
+        self.assertEqual(new_inventory["stock_level"], test_inventory.stock_level)
