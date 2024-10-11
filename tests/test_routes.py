@@ -15,7 +15,7 @@
 ######################################################################
 
 """
-TestYourResourceModel API Service Test Suite
+TestInventory API Service Test Suite
 """
 
 # pylint: disable=duplicate-code
@@ -24,7 +24,7 @@ import logging
 from unittest import TestCase
 from wsgi import app
 from service.common import status
-from service.models import db, YourResourceModel
+from service.models import db, Inventory
 
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql+psycopg://postgres:postgres@localhost:5432/testdb"
@@ -35,7 +35,7 @@ DATABASE_URI = os.getenv(
 #  T E S T   C A S E S
 ######################################################################
 # pylint: disable=too-many-public-methods
-class TestYourResourceService(TestCase):
+class TestInventory(TestCase):
     """REST API Server Tests"""
 
     @classmethod
@@ -56,7 +56,7 @@ class TestYourResourceService(TestCase):
     def setUp(self):
         """Runs before each test"""
         self.client = app.test_client()
-        db.session.query(YourResourceModel).delete()  # clean up the last tests
+        db.session.query(Inventory).delete()  # clean up the last tests
         db.session.commit()
 
     def tearDown(self):
