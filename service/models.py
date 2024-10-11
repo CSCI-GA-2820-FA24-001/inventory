@@ -29,9 +29,10 @@ class Inventory(db.Model):
     name = db.Column(db.String(63))
 
     # Todo: Place the rest of your schema here...
-    quantity = db.Column(db.Integer, nullable = False)
-    condition = db.Column(db.String(20), nullable = False)
-    stock_level = db.Column(db.String(20), nullable = False)
+    quantity = db.Column(db.Integer, nullable=False)
+    condition = db.Column(db.String(20), nullable=False)
+    stock_level = db.Column(db.String(20), nullable=False)
+
     def __repr__(self):
         return f"<Inventory {self.name} id=[{self.id}]>"
 
@@ -74,7 +75,13 @@ class Inventory(db.Model):
 
     def serialize(self):
         """Serializes a Inventory into a dictionary"""
-        return {"id": self.id, "name": self.name, "quantity": self.quantity, "condition":self.condition, "stock_level":self.stock_level}
+        return {
+            "id": self.id,
+            "name": self.name,
+            "quantity": self.quantity,
+            "condition": self.condition,
+            "stock_level": self.stock_level,
+        }
 
     def deserialize(self, data):
         """
