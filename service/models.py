@@ -26,7 +26,7 @@ class Inventory(db.Model):
     # Table Schema
     ##################################################
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(63))
+    name = db.Column(db.String(63), nullable=False)
 
     # Todo: Place the rest of your schema here...
     quantity = db.Column(db.Integer, nullable=False)
@@ -92,6 +92,9 @@ class Inventory(db.Model):
         """
         try:
             self.name = data["name"]
+            self.quantity = data["quantity"]
+            self.condition = data["condition"]
+            self.stock_level = data["stock_level"]
         except AttributeError as error:
             raise DataValidationError("Invalid attribute: " + error.args[0]) from error
         except KeyError as error:
@@ -111,22 +114,22 @@ class Inventory(db.Model):
 
     @classmethod
     def all(cls):
-        """Returns all of the YourResourceModels in the database"""
-        logger.info("Processing all YourResourceModels")
+        """Returns all of the Inventory in the database"""
+        logger.info("Processing all Inventory")
         return cls.query.all()
 
     @classmethod
     def find(cls, by_id):
-        """Finds a YourResourceModel by it's ID"""
+        """Finds a Inventory by it's ID"""
         logger.info("Processing lookup for id %s ...", by_id)
         return cls.query.session.get(cls, by_id)
 
     @classmethod
     def find_by_name(cls, name):
-        """Returns all YourResourceModels with the given name
+        """Returns all Inventory with the given name
 
         Args:
-            name (string): the name of the YourResourceModels you want to match
+            name (string): the name of the Inventory you want to match
         """
         logger.info("Processing name query for %s ...", name)
         return cls.query.filter(cls.name == name)

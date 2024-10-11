@@ -34,7 +34,11 @@ from service.common import status  # HTTP Status Codes
 def index():
     """Root URL response"""
     return (
-        "Reminder: return some useful information in json format about the service here",
+        jsonify(
+            name="Inventory Service",
+            version="1.0",
+            paths=url_for("list_inventory", _external=True),
+        ),
         status.HTTP_200_OK,
     )
 
@@ -62,7 +66,7 @@ def create_inventory():
     app.logger.info("Inventory with new id [%s] saved!", inventory.id)
 
     # Return the location of the new Inventory item
-    location_url = url_for("get_inventory", inventory_id=inventory.id, _external=True)
+    location_url = url_for("get_inventory", id=inventory.id, _external=True)
     return (
         jsonify(inventory.serialize()),
         status.HTTP_201_CREATED,
@@ -77,7 +81,11 @@ def list_inventory():
 
 @app.route("/inventory/<int:id>", methods=["GET"])
 def get_inventory(id):
-    return jsonify({"error": "NOT IMPLEMENTED"}), 400
+    app.logger.info("Request to Retrieve a Inventory with id [%s]", id)
+    inventory = Inventory.find(id)
+    if not inventory:
+        abort(status.HTTP_404_NOT_FOUND, f"Inventory with id '{id}' was not found.")
+    return jsonify(inventory.serialize()), status.HTTP_200_OK
 
 
 @app.route("/inventory/<int:id>", methods=["PUT"])
