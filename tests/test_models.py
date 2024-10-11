@@ -23,6 +23,7 @@ import os
 import logging
 from unittest import TestCase
 from wsgi import app
+
 from service.models import Inventory, db
 from .factories import InventoryFactory
 
@@ -65,15 +66,18 @@ class TestInventory(TestCase):
     #  T E S T   C A S E S
     ######################################################################
 
-    def test_example_replace_this(self):
+
+    # Todo: Add your test cases here...
+    def test_inventory_factory(self):
         """It should create a Inventory"""
-        # Todo: Remove this test case example
         resource = InventoryFactory()
         resource.create()
         self.assertIsNotNone(resource.id)
         found = Inventory.all()
         self.assertEqual(len(found), 1)
         data = Inventory.find(resource.id)
+
         self.assertEqual(data.name, resource.name)
 
-    # Todo: Add your test cases here...
+        # Todo: Add your test cases here...
+

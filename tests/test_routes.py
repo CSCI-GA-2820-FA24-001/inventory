@@ -39,6 +39,7 @@ BASE_URL = "/inventory"
 #  T E S T   C A S E S
 ######################################################################
 # pylint: disable=too-many-public-methods
+
 class TestInventoryService(TestCase):
     """REST API Server Tests"""
 
