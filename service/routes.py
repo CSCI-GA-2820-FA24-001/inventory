@@ -50,11 +50,30 @@ def create_inventory():
 
 @app.route('/inventory', methods=['GET'])
 def list_inventory():
-    return jsonify({'error': "NOT IMPLEMENTED"}), 400
+
+    inventories = []
+
+    # Parse any arguments from the query string
+    name = request.args.get("name")
+    condition = request.args.get("condition")
+    stock_level = request.args.get("stock_level")
+
+
+    if name:
+        inventories = Inventory.find_by_name(name)
+    else:
+        inventories = Inventory.all()
+
+    results = [inventories.serialize() for inventory in inventories]
+    return jsonify(results), status.HTTP_200_OK
 
 @app.route('/inventory/<int:id>', methods=['GET'])
 def get_inventory(id):
-    return jsonify({'error': "NOT IMPLEMENTED"}), 400
+    inventory = Inventory.find(id)
+    if not inventory:
+        abort(status.HTTP_404_NOT_FOUND, f"Inventory with id '{id}' was not found.")
+
+    return jsonify(inventory.serialize()), status.HTTP_200_OK
 
 @app.route('/inventory/<int:id>', methods=['PUT'])
 def update_inventory(id):
