@@ -122,6 +122,15 @@ class TestInventoryService(TestCase):
         self.assertEqual(new_inventory["condition"], test_inventory.condition)
         self.assertEqual(new_inventory["stock_level"], test_inventory.stock_level)
 
+    # TEST LIST
+    def test_get_inventory_list(self):
+        """It should get a list of Inventory items"""
+        self._create_inventory(10)
+        response = self.client.get(BASE_URL)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(len(data), 10)
+
     # TEST GET
     def test_get_inventory(self):
         """It should get an inventory item"""
