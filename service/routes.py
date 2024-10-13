@@ -15,15 +15,15 @@
 ######################################################################
 
 """
-YourResourceModel Service
+Inventory Service
 
 This service implements a REST API that allows you to Create, Read, Update
-and Delete YourResourceModel
+and Delete Inventory
 """
 
 from flask import jsonify, request, url_for, abort
 from flask import current_app as app  # Import Flask application
-from service.models import Inventory, DataValidationError
+from service.models import Inventory
 from service.common import status  # HTTP Status Codes
 
 
@@ -34,7 +34,11 @@ from service.common import status  # HTTP Status Codes
 def index():
     """Root URL response"""
     return (
-        "Reminder: return some useful information in json format about the service here",
+        jsonify(
+            name="Inventory Service",
+            version="1.0",
+            paths=url_for("list_inventory", _external=True),
+        ),
         status.HTTP_200_OK,
     )
 
@@ -43,25 +47,92 @@ def index():
 #  R E S T   A P I   E N D P O I N T S
 ######################################################################
 
+
 # Todo: Place your REST API code here ...
-@app.route('/inventory', methods=['POST'])
+@app.route("/inventory", methods=["POST"])
 def create_inventory():
-    return jsonify({'error': "NOT IMPLEMENTED"}), 400
+    """Create an Inventory item"""
+    app.logger.info("Request to Create an Inventory Item...")
+    check_content_type("application/json")
 
-@app.route('/inventory', methods=['GET'])
+    inventory = Inventory()
+    # Get the data from the request and deserialize it
+    data = request.get_json()
+    app.logger.info("Processing: %s", data)
+    inventory.deserialize(data)
+
+    # Save the new Inventory to the database
+    inventory.create()
+    app.logger.info("Inventory with new id [%s] saved!", inventory.id)
+
+    # Return the location of the new Inventory item
+    location_url = url_for("get_inventory", id=inventory.id, _external=True)
+    return (
+        jsonify(inventory.serialize()),
+        status.HTTP_201_CREATED,
+        {"Location": location_url},
+    )
+
+
+@app.route("/inventory", methods=["GET"])
 def list_inventory():
-    return jsonify({'error': "NOT IMPLEMENTED"}), 400
+    app.logger.info("Request to list all Inventory Items...")
+    inventories = []
 
-@app.route('/inventory/<int:id>', methods=['GET'])
+    # Parse any arguments from the query string
+    name = request.args.get("name")
+    quantity = request.args.get("quantity")
+    condition = request.args.get("condition")
+    stock_level = request.args.get("stock_level")
+
+    inventories = Inventory.all()
+
+    if name:
+        app.logger.info("Filter by name")
+        inventories = [inventory for inventory in inventories if inventory.name == name]
+    if quantity:
+        app.logger.info("Filter by quantity")
+        inventories = [
+            inventory
+            for inventory in inventories
+            if inventory.quantity == int(quantity)
+        ]
+    if condition:
+        app.logger.info("Filter by condition")
+        inventories = [
+            inventory for inventory in inventories if inventory.condition == condition
+        ]
+    if stock_level:
+        app.logger.info("Filter by stock level")
+        inventories = [
+            inventory
+            for inventory in inventories
+            if inventory.stock_level == stock_level
+        ]
+
+    results = [inventory.serialize() for inventory in inventories]
+    app.logger.info("Returning %d inventory item", len(results))
+    return jsonify(results), status.HTTP_200_OK
+
+
+@app.route("/inventory/<int:id>", methods=["GET"])
 def get_inventory(id):
-    return jsonify({'error': "NOT IMPLEMENTED"}), 400
+    app.logger.info("Request to Retrieve a Inventory with id [%s]", id)
+    inventory = Inventory.find(id)
+    if not inventory:
+        abort(status.HTTP_404_NOT_FOUND, f"Inventory with id '{id}' was not found.")
 
-@app.route('/inventory/<int:id>', methods=['PUT'])
+    return jsonify(inventory.serialize()), status.HTTP_200_OK
+
+
+@app.route("/inventory/<int:id>", methods=["PUT"])
 def update_inventory(id):
-    return jsonify({'error': "NOT IMPLEMENTED"}), 400
+    return jsonify({"error": "NOT IMPLEMENTED"}), 400
 
-@app.route('/inventory/<int:id>', methods=['DELETE'])
+
+@app.route("/inventory/<int:id>", methods=["DELETE"])
 def delete_inventory(id):
+<<<<<<< HEAD
     app.logger.info(f"delete inventory with id: {id}")
     inventory = Inventory.find(id) 
     if inventory is None:
@@ -75,3 +146,25 @@ def delete_inventory(id):
     except DataValidationError as e:
         app.logger.error(f"Error deleting inventory: {str(e)}")
         return jsonify({"error": str(e)}), status.HTTP_400_BAD_REQUEST
+=======
+    return jsonify({"error": "NOT IMPLEMENTED"}), 400
+
+
+def check_content_type(content_type) -> None:
+    """Checks that the media type is correct"""
+    if "Content-Type" not in request.headers:
+        app.logger.error("No Content-Type specified.")
+        abort(
+            status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
+            f"Content-Type must be {content_type}",
+        )
+
+    if request.headers["Content-Type"] == content_type:
+        return
+
+    app.logger.error("Invalid Content-Type: %s", request.headers["Content-Type"])
+    abort(
+        status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
+        f"Content-Type must be {content_type}",
+    )
+>>>>>>> origin/master

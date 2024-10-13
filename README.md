@@ -3,29 +3,10 @@
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Python](https://img.shields.io/badge/Language-Python-blue.svg)](https://python.org/)
 
-This is a skeleton you can use to start your projects
 
 ## Overview
 
-This project template contains starter code for your class project. The `/service` folder contains your `models.py` file for your model and a `routes.py` file for your service. The `/tests` folder has test case starter code for testing the model and the service separately. All you need to do is add your functionality. You can use the [lab-flask-tdd](https://github.com/nyu-devops/lab-flask-tdd) for code examples to copy from.
-
-## Automatic Setup
-
-The best way to use this repo is to start your own repo using it as a git template. To do this just press the green **Use this template** button in GitHub and this will become the source for your repository.
-
-## Manual Setup
-
-You can also clone this repository and then copy and paste the starter code into your project repo folder on your local computer. Be careful not to copy over your own `README.md` file so be selective in what you copy.
-
-There are 4 hidden files that you will need to copy manually if you use the Mac Finder or Windows Explorer to copy files from this folder into your repo folder.
-
-These should be copied using a bash shell as follows:
-
-```bash
-    cp .gitignore  ../<your_repo_folder>/
-    cp .flaskenv ../<your_repo_folder>/
-    cp .gitattributes ../<your_repo_folder>/
-```
+This project is the implementation of inventory function under an E-Commerce platform, being developed for the NYU course DevOps & Agile Methodologies. The `/service` folder contains `models.py` file for the model and a `routes.py` file for the service. The `/tests` folder has test case starter code for testing the model and the service separately. For functionality implemenation, we refered to the [lab-flask-tdd](https://github.com/nyu-devops/lab-flask-tdd) for code examples.
 
 ## Contents
 
@@ -58,6 +39,38 @@ tests/                     - test cases package
 └── test_routes.py         - test suite for service routes
 ```
 
+## REST API
+This project provides a REST API for managing an inventory system, allowing for creating, reading, updating, and deleting inventory items.
+
+### Models
+The models.py file defines the data model for the Inventory. It uses SQLAlchemy for ORM (Object-Relational Mapping). The key components of the model include:
+
+- Inventory: Represents an inventory item with fields for:
+  - id: Unique identifier (primary key)
+  - name: Name of the inventory item
+  - quantity: Quantity of the item
+  - condition: Condition of the item (e.g., new, used)
+  - stock_level: Stock level description (e.g., in stock, out of stock)
+
+It also includes methods for basic CRUD (Create, Read, Update, Delete) operations, as well as serialization/deserialization for working with JSON data.
+
+### API Endpoints
+The routes.py file defines the endpoints for the Inventory API. Currently, placeholders are present, and further implementation is needed. The API endpoints include:
+
+- GET /inventory: List all inventory items
+- POST /inventory: Create a new inventory item
+- GET /inventory/<id>: Retrieve a specific inventory item by ID
+- PUT /inventory/<id>: Update a specific inventory item by ID
+- DELETE /inventory/<id>: Delete a specific inventory item by ID
+
+### Setup and Usage
+1. Install dependencies.
+2. Initialize the database using SQLAlchemy.
+3. Implement the REST API functionality in routes.py.
+
+License
+This project is licensed under the Apache License 2.0. See the LICENSE file for more details.
+
 ## License
 
 Copyright (c) 2016, 2024 [John Rofrano](https://www.linkedin.com/in/JohnRofrano/). All rights reserved.
@@ -65,3 +78,10 @@ Copyright (c) 2016, 2024 [John Rofrano](https://www.linkedin.com/in/JohnRofrano/
 Licensed under the Apache License. See [LICENSE](LICENSE)
 
 This repository is part of the New York University (NYU) masters class: **CSCI-GA.2820-001 DevOps and Agile Methodologies** created and taught by [John Rofrano](https://cs.nyu.edu/~rofrano/), Adjunct Instructor, NYU Courant Institute, Graduate Division, Computer Science, and NYU Stern School of Business.
+
+The team members are:
+- [Shiwei He](https://www.linkedin.com/in/shiweihe0713/)
+- [Haozhou Huang](https://www.linkedin.com/in/haozhou-huang/)
+- [Haardik Dharma](https://www.linkedin.com/in/haardik-dharma/)
+- [Chengying Wang](https://www.linkedin.com/in/chengying-wang-03b85924a/)
+- Jesse Liu
