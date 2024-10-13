@@ -151,3 +151,23 @@ class TestInventoryService(TestCase):
         """It should not return an inventory that does not exist"""
         response = self.client.get(f"{BASE_URL}/1")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+    
+        # TEST DELETE
+    def test_delete_inventory(self):
+        """It should Delete an inventory item"""
+        # First, create an inventory item
+        test_inventory = self._create_inventory()[0]
+        logging.debug("Created inventory with id %s", test_inventory.id)
+
+        # Ensure the item has been created
+        response = self.client.get(f"{BASE_URL}/{test_inventory.id}")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # Delete the inventory item
+        response = self.client.delete(f"{BASE_URL}/{test_inventory.id}")
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        # Try to retrieve the deleted item, should return 404
+        response = self.client.get(f"{BASE_URL}/{test_inventory.id}")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
