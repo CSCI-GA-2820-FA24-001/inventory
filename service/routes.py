@@ -76,20 +76,42 @@ def create_inventory():
 
 @app.route("/inventory", methods=["GET"])
 def list_inventory():
+    app.logger.info("Request to list all Inventory Items...")
     inventories = []
 
     # Parse any arguments from the query string
     name = request.args.get("name")
+    quantity = request.args.get("quantity")
     condition = request.args.get("condition")
     stock_level = request.args.get("stock_level")
 
+    inventories = Inventory.all()
 
     if name:
-        inventories = Inventory.find_by_name(name)
-    else:
-        inventories = Inventory.all()
+        app.logger.info("Filter by name")
+        inventories = [inventory for inventory in inventories if inventory.name == name]
+    if quantity:
+        app.logger.info("Filter by quantity")
+        inventories = [
+            inventory
+            for inventory in inventories
+            if inventory.quantity == int(quantity)
+        ]
+    if condition:
+        app.logger.info("Filter by condition")
+        inventories = [
+            inventory for inventory in inventories if inventory.condition == condition
+        ]
+    if stock_level:
+        app.logger.info("Filter by stock level")
+        inventories = [
+            inventory
+            for inventory in inventories
+            if inventory.stock_level == stock_level
+        ]
 
-    results = [inventories.serialize() for inventory in inventories]
+    results = [inventory.serialize() for inventory in inventories]
+    app.logger.info("Returning %d inventory item", len(results))
     return jsonify(results), status.HTTP_200_OK
 
 
