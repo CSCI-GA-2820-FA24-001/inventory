@@ -2,10 +2,29 @@
 Models for Inventory
 
 All of the models are stored in this module
+
+Models
+------
+Inventory - An inventory item
+
+Attributes:
+-----------
+name (string) - the name of the inventory item
+quantity (int) - the quantity of the inventory item available
+condition (enum) - the condition of the inventory item
+stock_level (enum) - the stock level of the inventory item
 """
 
+import os
 import logging
+from enum import Enum
+from retry import retry
 from flask_sqlalchemy import SQLAlchemy
+
+# global variables for retry (must be int)
+RETRY_COUNT = int(os.environ.get("RETRY_COUNT", 5))
+RETRY_DELAY = int(os.environ.get("RETRY_DELAY", 1))
+RETRY_BACKOFF = int(os.environ.get("RETRY_BACKOFF", 2))
 
 logger = logging.getLogger("flask.app")
 
@@ -13,8 +32,36 @@ logger = logging.getLogger("flask.app")
 db = SQLAlchemy()
 
 
+@retry(
+    Exception,
+    delay=RETRY_DELAY,
+    backoff=RETRY_BACKOFF,
+    tries=RETRY_COUNT,
+    logger=logger,
+)
+def init_db() -> None:
+    """Initialize Tables"""
+    db.create_all()
+
+
 class DataValidationError(Exception):
     """Used for an data validation errors when deserializing"""
+
+
+class Condition(Enum):
+    """Enumeration of valid Inventory conditions"""
+
+    NEW = "NEW"
+    OPENBOX = "OPENBOX"
+    USED = "USED"
+
+
+class StockLevel(Enum):
+    """Enumeration of valid Inventory stock levels"""
+
+    IN_STOCK = "IN_STOCK"
+    LOW_STOCK = "LOW_STOCK"
+    OUT_OF_STOCK = "OUT_OF_STOCK"
 
 
 class Inventory(db.Model):
@@ -27,11 +74,11 @@ class Inventory(db.Model):
     ##################################################
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(63), nullable=False)
-
-    # Todo: Place the rest of your schema here...
     quantity = db.Column(db.Integer, nullable=False)
-    condition = db.Column(db.String(20), nullable=False)
-    stock_level = db.Column(db.String(20), nullable=False)
+    condition = db.Column(db.Enum(Condition), nullable=False, server_default="NEW")
+    stock_level = db.Column(
+        db.Enum(StockLevel), nullable=False, server_default="IN_STOCK"
+    )
 
     def __repr__(self):
         return f"<Inventory {self.name} id=[{self.id}]>"
@@ -79,8 +126,8 @@ class Inventory(db.Model):
             "id": self.id,
             "name": self.name,
             "quantity": self.quantity,
-            "condition": self.condition,
-            "stock_level": self.stock_level,
+            "condition": self.condition.value,
+            "stock_level": self.stock_level.value,
         }
 
     def deserialize(self, data):
@@ -93,8 +140,8 @@ class Inventory(db.Model):
         try:
             self.name = data["name"]
             self.quantity = data["quantity"]
-            self.condition = data["condition"]
-            self.stock_level = data["stock_level"]
+            self.condition = Condition(data["condition"])
+            self.stock_level = StockLevel(data["stock_level"])
         except AttributeError as error:
             raise DataValidationError("Invalid attribute: " + error.args[0]) from error
         except KeyError as error:

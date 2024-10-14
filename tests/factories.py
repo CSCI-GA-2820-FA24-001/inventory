@@ -5,7 +5,7 @@ Test Factory to make fake objects for testing
 import factory
 
 from factory.fuzzy import FuzzyChoice
-from service.models import Inventory
+from service.models import Inventory, Condition, StockLevel
 
 
 class InventoryFactory(factory.Factory):
@@ -20,6 +20,7 @@ class InventoryFactory(factory.Factory):
 
     name = factory.Faker("name")
     quantity = factory.Faker("random_int", min=0, max=10000)
-    condition = FuzzyChoice(choices=["NEW", "OPEN_BOX", "USED"])
-    stock_level = FuzzyChoice(choices=["LOW", "MEDIUM", "HIGH"])
-
+    condition = FuzzyChoice(choices=[Condition.NEW, Condition.USED, Condition.OPENBOX])
+    stock_level = FuzzyChoice(
+        choices=[StockLevel.IN_STOCK, StockLevel.OUT_OF_STOCK, StockLevel.LOW_STOCK]
+    )
