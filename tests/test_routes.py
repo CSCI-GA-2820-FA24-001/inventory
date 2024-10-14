@@ -350,6 +350,12 @@ class TestInventoryService(TestCase):
         with self.assertRaises(DataValidationError):
             inventory.deserialize(data)
 
+    def test_deserialize_bad_data(self):
+        """It should not deserialize bad data"""
+        data = "this is not a dictionary"
+        inventory = Inventory()
+        self.assertRaises(DataValidationError, inventory.deserialize, data)
+
     def test_find_by_name(self):
         """It should find an inventory item by name"""
         mock_query = MagicMock()  # Mock the query object
