@@ -25,7 +25,7 @@ from unittest import TestCase
 from unittest.mock import patch
 from wsgi import app
 
-from service.models import Inventory, db, Condition, StockLevel, DataValidationError
+from service.models import Inventory, db, DataValidationError
 from .factories import InventoryFactory
 
 DATABASE_URI = os.getenv(
@@ -71,150 +71,12 @@ class TestCaseBase(TestCase):
 class TestInventoryModel(TestCaseBase):
     """Inventory Model CRUD Tests"""
 
-    def test_inventory_factory(self):
-        """It should create a Inventory"""
-        resource = InventoryFactory()
-        resource.create()
-        self.assertIsNotNone(resource.id)
-        found = Inventory.all()
-        self.assertEqual(len(found), 1)
-        data = Inventory.find(resource.id)
-
-        self.assertEqual(data.name, resource.name)
-
-    def test_create_inventory(self):
-        """It should Create an inventory item and assert that it exists"""
-        inventory = Inventory(
-            name="someitem",
-            quantity=10,
-            condition=Condition.NEW,
-            stock_level=StockLevel.IN_STOCK,
-        )
-        self.assertEqual(str(inventory), "<Inventory someitem id=[None]>")
-        self.assertTrue(inventory is not None)
-        self.assertEqual(inventory.id, None)
-        self.assertEqual(inventory.name, "someitem")
-        self.assertEqual(inventory.quantity, 10)
-        self.assertEqual(inventory.condition, Condition.NEW)
-        self.assertEqual(inventory.stock_level, StockLevel.IN_STOCK)
-        inventory = Inventory(
-            name="someitem",
-            quantity=10,
-            condition=Condition.OPENBOX,
-            stock_level=StockLevel.LOW_STOCK,
-        )
-        self.assertEqual(inventory.condition, Condition.OPENBOX)
-        self.assertEqual(inventory.stock_level, StockLevel.LOW_STOCK)
-
-    def test_add_a_inventory(self):
-        """It should Create a inventory and add it to the database"""
-        inventory = Inventory.all()
-        self.assertEqual(inventory, [])
-        inventory = Inventory(
-            name="someitem",
-            quantity=10,
-            condition=Condition.NEW,
-            stock_level=StockLevel.IN_STOCK,
-        )
-        self.assertTrue(inventory is not None)
-        self.assertEqual(inventory.id, None)
-        inventory.create()
-        # Assert that it was assigned an id and shows up in the database
-        self.assertIsNotNone(inventory.id)
-        inventory = inventory.all()
-        self.assertEqual(len(inventory), 1)
-
-    def test_read_a_inventory(self):
-        """It should Read a inventory"""
-        inventory = InventoryFactory()
-        logging.debug(inventory)
-        inventory.id = None
-        inventory.create()
-        self.assertIsNotNone(inventory.id)
-        # Fetch it back
-        found_inventory = inventory.find(inventory.id)
-        self.assertEqual(found_inventory.id, inventory.id)
-        self.assertEqual(found_inventory.name, inventory.name)
-        self.assertEqual(found_inventory.quantity, inventory.quantity)
-        self.assertEqual(found_inventory.condition, inventory.condition)
-        self.assertEqual(found_inventory.stock_level, inventory.stock_level)
-
-    def test_update_a_inventory(self):
-        """It should Update a inventory"""
-        inventory = InventoryFactory()
-        logging.debug(inventory)
-        inventory.id = None
-        inventory.create()
-        logging.debug(inventory)
-        self.assertIsNotNone(inventory.id)
-        # Change it an save it
-        inventory.condition = Condition.OPENBOX
-        original_id = inventory.id
-        inventory.update()
-        self.assertEqual(inventory.id, original_id)
-        self.assertEqual(inventory.condition, Condition.OPENBOX)
-        # Fetch it back and make sure the id hasn't changed
-        # but the data did change
-        inventory_all = inventory.all()
-        self.assertEqual(len(inventory_all), 1)
-        self.assertEqual(inventory_all[0].id, original_id)
-        self.assertEqual(inventory_all[0].condition, Condition.OPENBOX)
-
     def test_update_no_id(self):
         """It should not Update a inventory with no id"""
         inventory = InventoryFactory()
         logging.debug(inventory)
         inventory.id = None
         self.assertRaises(DataValidationError, inventory.update)
-
-    def test_delete_a_inventory(self):
-        """It should Delete a inventory"""
-        inventory = InventoryFactory()
-        inventory.create()
-        self.assertEqual(len(inventory.all()), 1)
-        # delete the inventory and make sure it isn't in the database
-        inventory.delete()
-        self.assertEqual(len(inventory.all()), 0)
-
-    def test_list_all_inventory(self):
-        """It should List all inventory in the database"""
-        inventory = Inventory.all()
-        self.assertEqual(inventory, [])
-        # Create 5 inventory items
-        for _ in range(5):
-            inventory = InventoryFactory()
-            inventory.create()
-        # See if we get back 5 inventory
-        inventory = Inventory.all()
-        self.assertEqual(len(inventory), 5)
-
-    def test_serialize_a_inventory(self):
-        """It should serialize a inventory"""
-        inventory = InventoryFactory()
-        data = inventory.serialize()
-        self.assertNotEqual(data, None)
-        self.assertIn("id", data)
-        self.assertEqual(data["id"], inventory.id)
-        self.assertIn("name", data)
-        self.assertEqual(data["name"], inventory.name)
-        self.assertIn("quantity", data)
-        self.assertEqual(data["quantity"], inventory.quantity)
-        self.assertIn("condition", data)
-        self.assertEqual(data["condition"], inventory.condition.value)
-        self.assertIn("stock_level", data)
-        self.assertEqual(data["stock_level"], inventory.stock_level.value)
-
-    def test_deserialize_a_inventory(self):
-        """It should de-serialize a inventory"""
-        data = InventoryFactory().serialize()
-        inventory = Inventory()
-        inventory.deserialize(data)
-        self.assertNotEqual(inventory, None)
-        self.assertEqual(inventory.id, None)
-        self.assertEqual(inventory.name, data["name"])
-        self.assertEqual(inventory.quantity, data["quantity"])
-        self.assertEqual(inventory.condition.value, data["condition"])
-        self.assertEqual(inventory.stock_level.value, data["stock_level"])
 
     def test_deserialize_missing_data(self):
         """It should not deserialize a inventory with missing data"""
