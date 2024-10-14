@@ -102,6 +102,8 @@ class Inventory(db.Model):
         Updates a Inventory to the database
         """
         logger.info("Saving %s", self.name)
+        if not self.id:
+            raise DataValidationError("Update called with empty ID field")
         try:
             db.session.commit()
         except Exception as e:
@@ -126,8 +128,8 @@ class Inventory(db.Model):
             "id": self.id,
             "name": self.name,
             "quantity": self.quantity,
-            "condition": self.condition.value,
-            "stock_level": self.stock_level.value,
+            "condition": self.condition.value,  # convert enum to string
+            "stock_level": self.stock_level.value,  # convert enum to string
         }
 
     def deserialize(self, data):
@@ -139,9 +141,24 @@ class Inventory(db.Model):
         """
         try:
             self.name = data["name"]
-            self.quantity = data["quantity"]
-            self.condition = Condition(data["condition"])
-            self.stock_level = StockLevel(data["stock_level"])
+            if isinstance(data["quantity"], int):
+                self.quantity = data["quantity"]
+            else:
+                raise DataValidationError(
+                    "Invalid type for int [quantity]: " + str(type(data["quantity"]))
+                )
+            try:
+                self.condition = Condition(data["condition"])
+            except ValueError:
+                raise DataValidationError(
+                    f"Invalid value for Condition: {data['condition']}"
+                )
+            try:
+                self.stock_level = StockLevel(data["stock_level"])
+            except ValueError:
+                raise DataValidationError(
+                    f"Invalid value for StockLevel: {data['stock_level']}"
+                )
         except AttributeError as error:
             raise DataValidationError("Invalid attribute: " + error.args[0]) from error
         except KeyError as error:
@@ -180,3 +197,23 @@ class Inventory(db.Model):
         """
         logger.info("Processing name query for %s ...", name)
         return cls.query.filter(cls.name == name)
+
+    @classmethod
+    def find_by_condition(cls, condition):
+        """Returns all Inventory with the given condition
+
+        Args:
+            condition (string): the condition of the Inventory you want to match
+        """
+        logger.info("Processing condition query for %s ...", condition)
+        return cls.query.filter(cls.condition == condition)
+
+    @classmethod
+    def find_by_stock_level(cls, stock_level):
+        """Returns all Inventory with the given stock level
+
+        Args:
+            stock_level (string): the stock level of the Inventory you want to match
+        """
+        logger.info("Processing stock level query for %s ...", stock_level)
+        return cls.query.filter(cls.stock_level == stock_level)
