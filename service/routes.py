@@ -23,7 +23,7 @@ and Delete Inventory
 
 from flask import jsonify, request, url_for, abort
 from flask import current_app as app  # Import Flask application
-from service.models import Inventory
+from service.models import Inventory, DataValidationError
 from service.common import status  # HTTP Status Codes
 
 
@@ -48,7 +48,6 @@ def index():
 ######################################################################
 
 
-# Todo: Place your REST API code here ...
 @app.route("/inventory", methods=["POST"])
 def create_inventory():
     """Create an Inventory item"""
@@ -76,6 +75,7 @@ def create_inventory():
 
 @app.route("/inventory", methods=["GET"])
 def list_inventory():
+    """List all Inventory items"""
     app.logger.info("Request to list all Inventory Items...")
     inventories = []
 
@@ -117,6 +117,7 @@ def list_inventory():
 
 @app.route("/inventory/<int:id>", methods=["GET"])
 def get_inventory(id):
+    """Retrieve a single Inventory item"""
     app.logger.info("Request to Retrieve a Inventory with id [%s]", id)
     inventory = Inventory.find(id)
     if not inventory:
@@ -127,14 +128,32 @@ def get_inventory(id):
 
 @app.route("/inventory/<int:id>", methods=["PUT"])
 def update_inventory(id):
-    return jsonify({"error": "NOT IMPLEMENTED"}), 400
+    """Update an Inventory item"""
+    app.logger.info("Request to Update an inventory with id [%s]", id)
+    check_content_type("application/json")
+
+    # Attempt to find the Inventory and abort if not found
+    inventory = Inventory.find(id)
+    if not inventory:
+        abort(status.HTTP_404_NOT_FOUND, f"Inventory with id '{id}' was not found.")
+
+    # Update the Inventory with the new data
+    data = request.get_json()
+    app.logger.info("Processing: %s", data)
+    inventory.deserialize(data)
+
+    # Save the updates to the database
+    inventory.update()
+
+    app.logger.info("Inventory with ID: %d updated.", inventory.id)
+    return jsonify(inventory.serialize()), status.HTTP_200_OK
 
 
 @app.route("/inventory/<int:id>", methods=["DELETE"])
 def delete_inventory(id):
-<<<<<<< HEAD
+    """Delete an Inventory item"""
     app.logger.info(f"delete inventory with id: {id}")
-    inventory = Inventory.find(id) 
+    inventory = Inventory.find(id)
     if inventory is None:
         app.logger.error(f"Inventory with id {id} not found.")
         return jsonify({"error": "Inventory not found"}), status.HTTP_404_NOT_FOUND
@@ -142,12 +161,10 @@ def delete_inventory(id):
     try:
         inventory.delete()
         app.logger.info(f"Inventory with id {id} has deleted successfully.")
-        return '', status.HTTP_204_NO_CONTENT
+        return "", status.HTTP_204_NO_CONTENT
     except DataValidationError as e:
         app.logger.error(f"Error deleting inventory: {str(e)}")
         return jsonify({"error": str(e)}), status.HTTP_400_BAD_REQUEST
-=======
-    return jsonify({"error": "NOT IMPLEMENTED"}), 400
 
 
 def check_content_type(content_type) -> None:
@@ -167,4 +184,3 @@ def check_content_type(content_type) -> None:
         status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
         f"Content-Type must be {content_type}",
     )
->>>>>>> origin/master
