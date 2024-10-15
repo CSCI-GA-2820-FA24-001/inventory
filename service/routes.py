@@ -28,6 +28,15 @@ from service.common import status  # HTTP Status Codes
 
 
 ######################################################################
+# GET HEALTH CHECK
+######################################################################
+@app.route("/health")
+def health_check():
+    """Let them know our heart is still beating"""
+    return jsonify(status=200, message="Healthy"), status.HTTP_200_OK
+
+
+######################################################################
 # GET INDEX
 ######################################################################
 @app.route("/")
@@ -100,14 +109,16 @@ def list_inventory():
     if condition:
         app.logger.info("Filter by condition")
         inventories = [
-            inventory for inventory in inventories if inventory.condition == condition
+            inventory
+            for inventory in inventories
+            if inventory.condition.value == condition
         ]
     if stock_level:
         app.logger.info("Filter by stock level")
         inventories = [
             inventory
             for inventory in inventories
-            if inventory.stock_level == stock_level
+            if inventory.stock_level.value == stock_level
         ]
 
     results = [inventory.serialize() for inventory in inventories]

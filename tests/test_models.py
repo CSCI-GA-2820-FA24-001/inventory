@@ -15,16 +15,17 @@
 ######################################################################
 
 """
-Test cases for Pet Model
+Test cases for Inventory Model
 """
 
 # pylint: disable=duplicate-code
 import os
 import logging
 from unittest import TestCase
+from unittest.mock import patch
 from wsgi import app
 
-from service.models import Inventory, db
+from service.models import Inventory, db, DataValidationError
 from .factories import InventoryFactory
 
 DATABASE_URI = os.getenv(
@@ -36,8 +37,8 @@ DATABASE_URI = os.getenv(
 #  Inventory   M O D E L   T E S T   C A S E S
 ######################################################################
 # pylint: disable=too-many-public-methods
-class TestInventory(TestCase):
-    """Test Cases for Inventory Model"""
+class TestCaseBase(TestCase):
+    """Base Test Case for common setup"""
 
     @classmethod
     def setUpClass(cls):
@@ -62,22 +63,30 @@ class TestInventory(TestCase):
         """This runs after each test"""
         db.session.remove()
 
-    ######################################################################
-    #  T E S T   C A S E S
-    ######################################################################
 
+######################################################################
+#  T E S T   E X C E P T I O N   H A N D L E R S
+######################################################################
+class TestExceptionHandlers(TestCaseBase):
+    """Inventory Model Exception Handlers"""
 
-    # Todo: Add your test cases here...
-    def test_inventory_factory(self):
-        """It should create a Inventory"""
-        resource = InventoryFactory()
-        resource.create()
-        self.assertIsNotNone(resource.id)
-        found = Inventory.all()
-        self.assertEqual(len(found), 1)
-        data = Inventory.find(resource.id)
+    @patch("service.models.db.session.commit")
+    def test_create_exception(self, exception_mock):
+        """It should catch a create exception"""
+        exception_mock.side_effect = Exception()
+        inventory = InventoryFactory()
+        self.assertRaises(DataValidationError, inventory.create)
 
-        self.assertEqual(data.name, resource.name)
+    @patch("service.models.db.session.commit")
+    def test_update_exception(self, exception_mock):
+        """It should catch a update exception"""
+        exception_mock.side_effect = Exception()
+        inventory = InventoryFactory()
+        self.assertRaises(DataValidationError, inventory.update)
 
-        # Todo: Add your test cases here...
-
+    @patch("service.models.db.session.commit")
+    def test_delete_exception(self, exception_mock):
+        """It should catch a delete exception"""
+        exception_mock.side_effect = Exception()
+        inventory = InventoryFactory()
+        self.assertRaises(DataValidationError, inventory.delete)
