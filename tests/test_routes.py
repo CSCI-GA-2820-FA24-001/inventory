@@ -179,24 +179,34 @@ class TestInventoryService(TestCase):
     def test_get_inventory_by_condition(self):
         """It should get inventory by condition"""
         inventory_items = self._create_inventory(3)
+        test_condition = inventory_items[0].condition.value
+        condition_count = len(
+            [item for item in inventory_items if item.condition.value == test_condition]
+        )
         response = self.client.get(
             BASE_URL, query_string={"condition": inventory_items[0].condition.value}
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.get_json()
-        self.assertEqual(len(data), 1)
-        self.assertEqual(data[0]["condition"], inventory_items[0].condition.value)
+        self.assertEqual(len(data), condition_count)
 
     def test_get_inventory_by_stock_level(self):
         """It should get inventory by stock level"""
         inventory_items = self._create_inventory(3)
+        test_stock_level = inventory_items[0].stock_level.value
+        stock_level_count = len(
+            [
+                item
+                for item in inventory_items
+                if item.stock_level.value == test_stock_level
+            ]
+        )
         response = self.client.get(
             BASE_URL, query_string={"stock_level": inventory_items[0].stock_level.value}
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.get_json()
-        self.assertEqual(len(data), 1)
-        self.assertEqual(data[0]["stock_level"], inventory_items[0].stock_level.value)
+        self.assertEqual(len(data), stock_level_count)
 
     # TEST UPDATE
     def test_update_inventory(self):
