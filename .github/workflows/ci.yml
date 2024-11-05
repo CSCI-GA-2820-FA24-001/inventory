@@ -1,52 +1,69 @@
-name: Continuous Integration
+name: Inventory Team CI Build
 
 on:
-    push:
-        branches:
-            - master
-    pull_request:
-        branches:
-            - master
+  push:
+      branches:
+          - master
+      paths-ignore:
+      - 'README.md'
+      - '.vscode/**'
+  
+  pull_request:
+      branches:
+          - master
+      paths-ignore:
+      - 'README.md'
+      - '.vscode/**'
 
 jobs:
-    test:
-        runs-on: ubuntu-latest
+  build:
+    runs-on: ubuntu-latest
+    # use a known buidl env instead of installing python
+    container: python:3.11-slim
 
-        steps:
-        - name: Checkout repository
-          uses: actions/checkout@v3
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_PASSWORD: pgs3cr3t
+          POSTGRES_DB: testdb
+        ports:
+          - 5432:5432
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd "pg_isready"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
-        - name: Set up Python 3.11
-          uses: actions/setup-python@v3
-          with:
-            python-version: 3.11
-        
-        - name: Install Poetry
-          run: |
-            curl -sSL https://install.python-poetry.org | python3 -
-            export PATH="$HOME/.local/bin:$PATH"
+    # Steps for the build
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-        - name: Install dependencies
-          run: |
-            poetry install --no-interaction --no-root
-        
-        - name: Run tests with coverage
-          run: |
-            poetry run pytest --cov=./ tests/
-          env:
-            CI: true
-        
-        - name: Upload coverage to Codecov
-          uses: codecov/codecov-action@v3
-          with: 
-            token: ${{ secrets.CODECOV_TOKEN }}
+      - name: Install dependencies
+        run: |
+          python -m pip install -U pip poetry
+          poetry config virtualenvs.create false
+          poetry install
+      
+      - name: Run code quality checks
+        run: |
+          # Flake8 check for syntax errors
+          flake8 service tests --count --select=E9,F63,F7,F82 --show-source --statistics
+          # check for complexity(Github editor is 127 char wide)
+          flake8 service tests --count --max-complexity=10 --max-line-length=127 --statistics
+          # run linting on the service
+          pylint service tests --max-line-length=127
+      
+      - name: Run unit test with pytest
+        run: |
+          pytest --pspec --cov=service --cov-fail-under=95 --disable-warnings
+        env:
+          FLASK_APP: "wsgi:app"
+          DATABASE_URI: "postgresql+psycopg://postgres:pgs3cr3t@postgres:5432/testdb"
 
-        - name: Run flake 8
-          run: |
-            poetry run flake8 .
-          continue-on-error: false
-        
-        - name: Run pylint
-          run: |
-            poetry run find . -name "*.py" | xargs pylint
-          continue-on-error: false
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with: 
+          token: ${{ secrets.CODECOV_TOKEN }}
