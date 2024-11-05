@@ -43,6 +43,7 @@ jobs:
 
       - name: Install dependencies
         run: |
+          python -m pip install -U pip poetry  # Install both pip and Poetry
           poetry config virtualenvs.create false
           poetry install
       
