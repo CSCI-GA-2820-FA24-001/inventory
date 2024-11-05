@@ -126,7 +126,7 @@ def list_inventory():
     return jsonify(results), status.HTTP_200_OK
 
 
-@app.route("/inventory/<int:id>", methods=["GET"])
+@app.route("/inventory/<int:inventory_id>", methods=["GET"])
 def get_inventory(inventory_id):
     """Retrieve a single Inventory item"""
     app.logger.info("Request to Retrieve a Inventory with id [%s]", inventory_id)
@@ -137,7 +137,7 @@ def get_inventory(inventory_id):
     return jsonify(inventory.serialize()), status.HTTP_200_OK
 
 
-@app.route("/inventory/<int:id>", methods=["PUT"])
+@app.route("/inventory/<int:inventory_id>", methods=["PUT"])
 def update_inventory(inventory_id):
     """Update an Inventory item"""
     app.logger.info("Request to Update an inventory with id [%s]", inventory_id)
@@ -160,7 +160,7 @@ def update_inventory(inventory_id):
     return jsonify(inventory.serialize()), status.HTTP_200_OK
 
 
-@app.route("/inventory/<int:id>", methods=["DELETE"])
+@app.route("/inventory/<int:inventory_id>", methods=["DELETE"])
 def delete_inventory(inventory_id):
     """Delete an Inventory item"""
     app.logger.info(f"delete inventory with id: {inventory_id}")
