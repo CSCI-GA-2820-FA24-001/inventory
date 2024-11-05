@@ -24,7 +24,7 @@ jobs:
         - name: Install dependencies
           run: |
             python -m pip install --upgrade pip
-            pip install -r requirements.txt flake8 pylint pytest pytest-cov codecov
+            pip install flake8 pylint pytest pytest-cov codecov
         
         - name: Run tests with coverage
           run: |
