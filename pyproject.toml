@@ -21,7 +21,7 @@ pylint = "^3.2.2"
 flake8 = "^7.0.0"
 black = "^24.4.2"
 pytest = "^8.2.1"
-# pytest-pspec = "^0.0.4"
+pytest-pspec = "^0.0.4"
 pytest-cov = "^5.0.0"
 factory-boy = "^3.3.0"
 coverage = "^7.5.3"
@@ -42,7 +42,8 @@ disable = "no-member,protected-access,global-statement"
 
 [tool.pytest.ini_options]
 minversion = "6.0"
-addopts = "--pspec --cov=service --cov-fail-under=95"
+# addopts = "--pspec --cov=service --cov-fail-under=95"
+addopts = "--cov=service --cov-fail-under=95"
 testpaths = ["tests"]
 
 [tool.coverage.run]
