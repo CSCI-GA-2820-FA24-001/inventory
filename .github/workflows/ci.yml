@@ -43,7 +43,7 @@ jobs:
 
       - name: Install poetry
         run: |
-          python -m pip install --upgrade pip poetry  # Ensure pip and Poetry are installed
+          python -m pip install --upgrade poetry  # Ensure pip and Poetry are installed
           poetry config virtualenvs.in-project true    # Enable project-local venv to isolate dependencies
           poetry shell
       
