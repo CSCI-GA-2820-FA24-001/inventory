@@ -74,7 +74,7 @@ def create_inventory():
     app.logger.info("Inventory with new id [%s] saved!", inventory.id)
 
     # Return the location of the new Inventory item
-    location_url = url_for("get_inventory", id=inventory.id, _external=True)
+    location_url = url_for("get_inventory", inventory_id=inventory.id, _external=True)
     return (
         jsonify(inventory.serialize()),
         status.HTTP_201_CREATED,
