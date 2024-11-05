@@ -74,7 +74,7 @@ def create_inventory():
     app.logger.info("Inventory with new id [%s] saved!", inventory.id)
 
     # Return the location of the new Inventory item
-    location_url = url_for("get_inventory", id=inventory.id, _external=True)
+    location_url = url_for("get_inventory", inventory_id=inventory.id, _external=True)
     return (
         jsonify(inventory.serialize()),
         status.HTTP_201_CREATED,
@@ -126,25 +126,25 @@ def list_inventory():
     return jsonify(results), status.HTTP_200_OK
 
 
-@app.route("/inventory/<int:id>", methods=["GET"])
-def get_inventory(id):
+@app.route("/inventory/<int:inventory_id>", methods=["GET"])
+def get_inventory(inventory_id):
     """Retrieve a single Inventory item"""
-    app.logger.info("Request to Retrieve a Inventory with id [%s]", id)
-    inventory = Inventory.find(id)
+    app.logger.info("Request to Retrieve a Inventory with id [%s]", inventory_id)
+    inventory = Inventory.find(inventory_id)
     if not inventory:
-        abort(status.HTTP_404_NOT_FOUND, f"Inventory with id '{id}' was not found.")
+        abort(status.HTTP_404_NOT_FOUND, f"Inventory with id '{inventory_id}' was not found.")
 
     return jsonify(inventory.serialize()), status.HTTP_200_OK
 
 
-@app.route("/inventory/<int:id>", methods=["PUT"])
-def update_inventory(id):
+@app.route("/inventory/<int:inventory_id>", methods=["PUT"])
+def update_inventory(inventory_id):
     """Update an Inventory item"""
-    app.logger.info("Request to Update an inventory with id [%s]", id)
+    app.logger.info("Request to Update an inventory with id [%s]", inventory_id)
     check_content_type("application/json")
 
     # Attempt to find the Inventory and abort if not found
-    inventory = Inventory.find(id)
+    inventory = Inventory.find(inventory_id)
     if not inventory:
         abort(status.HTTP_404_NOT_FOUND, f"Inventory with id '{id}' was not found.")
 
@@ -156,17 +156,17 @@ def update_inventory(id):
     # Save the updates to the database
     inventory.update()
 
-    app.logger.info("Inventory with ID: %d updated.", inventory.id)
+    app.logger.info("Inventory with ID: %d updated.", inventory_id)
     return jsonify(inventory.serialize()), status.HTTP_200_OK
 
 
-@app.route("/inventory/<int:id>", methods=["DELETE"])
-def delete_inventory(id):
+@app.route("/inventory/<int:inventory_id>", methods=["DELETE"])
+def delete_inventory(inventory_id):
     """Delete an Inventory item"""
-    app.logger.info(f"delete inventory with id: {id}")
-    inventory = Inventory.find(id)
+    app.logger.info(f"delete inventory with id: {inventory_id}")
+    inventory = Inventory.find(inventory_id)
     if inventory is None:
-        app.logger.error(f"Inventory with id {id} not found.")
+        app.logger.error(f"Inventory with id {inventory_id} not found.")
         return jsonify({"error": "Inventory not found"}), status.HTTP_404_NOT_FOUND
 
     try:

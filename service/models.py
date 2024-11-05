@@ -147,18 +147,17 @@ class Inventory(db.Model):
                 raise DataValidationError(
                     "Invalid type for int [quantity]: " + str(type(data["quantity"]))
                 )
+
             try:
                 self.condition = Condition(data["condition"])
-            except ValueError:
-                raise DataValidationError(
-                    f"Invalid value for Condition: {data['condition']}"
-                )
+            except ValueError as exc:
+                raise DataValidationError(f"Invalid value for Condition: {data['condition']}") from exc
+
             try:
                 self.stock_level = StockLevel(data["stock_level"])
-            except ValueError:
-                raise DataValidationError(
-                    f"Invalid value for StockLevel: {data['stock_level']}"
-                )
+            except ValueError as exc:
+                raise DataValidationError(f"Invalid value for StockLevel: {data['stock_level']}") from exc
+
         except AttributeError as error:
             raise DataValidationError("Invalid attribute: " + error.args[0]) from error
         except KeyError as error:
