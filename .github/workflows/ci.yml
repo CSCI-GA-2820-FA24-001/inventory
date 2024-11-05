@@ -43,8 +43,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-          sudo poetry config virtualenvs.create false
-          sudo poetry install
+          poetry config virtualenvs.create false
+          poetry install
       
       - name: Run code quality checks
         run: |
