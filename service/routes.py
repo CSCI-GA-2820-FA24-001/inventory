@@ -162,7 +162,7 @@ def update_inventory(inventory_id):
     # Save the updates to the database
     inventory.update()
 
-    app.logger.info("Inventory with ID: %d updated.", inventory.id)
+    app.logger.info("Inventory with ID: %d updated.", inventory_id)
     return jsonify(inventory.serialize()), status.HTTP_200_OK
 
 
