@@ -23,11 +23,11 @@ import os
 import logging
 from unittest import TestCase
 from unittest.mock import patch, MagicMock
+from sqlalchemy import inspect
 from service.models import db, Inventory, Condition, StockLevel, DataValidationError
 from service.common import status
 from tests.factories import InventoryFactory
 from wsgi import app
-from sqlalchemy import inspect
 
 
 DATABASE_URI = os.getenv(
