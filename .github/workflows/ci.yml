@@ -1,0 +1,48 @@
+name: Continuous Integration
+
+on:
+    push:
+        branches:
+            - master
+    pull_request:
+        branches:
+            - master
+
+jobs:
+    test:
+        runs-on: ubuntu-latest
+
+        steps:
+        - name: Checkout repository
+          uses: actions/checkout@v2
+
+        - name: Set up Python 3.11-slim
+          uses: actions/setup-python@v2
+          with:
+            python-version: 3.11-slim
+        
+        - name: Install dependencies
+          run: |
+            python -m pip install --upgrade pip
+            pip install -r requirements.txt flake8 pylint pytest pytest-cov codecov
+        
+        - name: Run tests with coverage
+          run: |
+            pytest --cov=./ tests/
+          env:
+            CI: true
+        
+        - name: Upload coverage to Codecov
+          uses: codecov/codecov-action@v3
+          with: 
+            token: ${{ secrets.CODECOV_TOKEN }}
+
+        - name: Run flake 8
+          run: |
+            flake8 .
+          continue-on-error: false
+        
+        - name: Run pylint
+          run: |
+            find . -name "*.py" | xargs pylint
+          continue-on-error: false
