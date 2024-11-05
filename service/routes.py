@@ -144,7 +144,7 @@ def update_inventory(inventory_id):
     check_content_type("application/json")
 
     # Attempt to find the Inventory and abort if not found
-    inventory = Inventory.find(id)
+    inventory = Inventory.find(inventory_id)
     if not inventory:
         abort(status.HTTP_404_NOT_FOUND, f"Inventory with id '{id}' was not found.")
 
@@ -156,7 +156,7 @@ def update_inventory(inventory_id):
     # Save the updates to the database
     inventory.update()
 
-    app.logger.info("Inventory with ID: %d updated.", inventory.id)
+    app.logger.info("Inventory with ID: %d updated.", inventory_id)
     return jsonify(inventory.serialize()), status.HTTP_200_OK
 
 
