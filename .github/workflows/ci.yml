@@ -32,7 +32,7 @@ jobs:
         
         - name: Run tests with coverage
           run: |
-            pytest --cov=./ tests/
+            poetry run pytest --cov=./ tests/
           env:
             CI: true
         
@@ -43,10 +43,10 @@ jobs:
 
         - name: Run flake 8
           run: |
-            flake8 .
+            poetry run flake8 .
           continue-on-error: false
         
         - name: Run pylint
           run: |
-            find . -name "*.py" | xargs pylint
+            poetry run find . -name "*.py" | xargs pylint
           continue-on-error: false
