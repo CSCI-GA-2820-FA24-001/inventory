@@ -43,20 +43,14 @@ jobs:
 
       - name: Install poetry
         run: |
-          python -m pip install --upgrade pip poetry
-          poetry config virtualenvs.create false
-      
-      - name: Install dependencies
-        run: |
+          python -m pip install --upgrade poetry
+          poetry config virtualenvs.in-project true  # Create venv in project directory
           poetry install
       
       - name: Run code quality checks
         run: |
-          # Flake8 check for syntax errors
           poetry run flake8 service tests --count --select=E9,F63,F7,F82 --show-source --statistics
-          # check for complexity(Github editor is 127 char wide)
           poetry run flake8 service tests --count --max-complexity=10 --max-line-length=127 --statistics
-          # run linting on the service
           poetry run pylint service tests --max-line-length=127
       
       - name: Run unit test with pytest
