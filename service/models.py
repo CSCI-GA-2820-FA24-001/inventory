@@ -141,34 +141,15 @@ class Inventory(db.Model):
         """
         try:
             self.name = data["name"]
-            if isinstance(data["quantity"], int):
-                self.quantity = data["quantity"]
-            else:
-                raise DataValidationError(
-                    "Invalid type for int [quantity]: " + str(type(data["quantity"]))
-                )
-
-            try:
-                self.condition = Condition(data["condition"])
-            except ValueError as exc:
-                raise DataValidationError(f"Invalid value for Condition: {data['condition']}") from exc
-
-            try:
-                self.stock_level = StockLevel(data["stock_level"])
-            except ValueError as exc:
-                raise DataValidationError(f"Invalid value for StockLevel: {data['stock_level']}") from exc
-
-        except AttributeError as error:
-            raise DataValidationError("Invalid attribute: " + error.args[0]) from error
-        except KeyError as error:
-            raise DataValidationError(
-                "Invalid Inventory: missing " + error.args[0]
-            ) from error
-        except TypeError as error:
-            raise DataValidationError(
-                "Invalid Inventory: body of request contained bad or no data "
-                + str(error)
-            ) from error
+            self.quantity = int(
+                data["quantity"]
+            )  # Ensures quantity is int or raises ValueError
+            self.condition = Condition(data["condition"])
+            self.stock_level = StockLevel(data["stock_level"])
+        except ValueError as exc:
+            raise DataValidationError(f"Invalid type or value in data: {exc}") from exc
+        except (KeyError, TypeError) as error:
+            raise DataValidationError(f"Invalid Inventory: {error.args[0]}") from error
         return self
 
     ##################################################

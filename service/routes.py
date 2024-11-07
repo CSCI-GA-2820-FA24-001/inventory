@@ -132,7 +132,10 @@ def get_inventory(inventory_id):
     app.logger.info("Request to Retrieve a Inventory with id [%s]", inventory_id)
     inventory = Inventory.find(inventory_id)
     if not inventory:
-        abort(status.HTTP_404_NOT_FOUND, f"Inventory with id '{inventory_id}' was not found.")
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Inventory with id '{inventory_id}' was not found.",
+        )
 
     return jsonify(inventory.serialize()), status.HTTP_200_OK
 
@@ -146,7 +149,10 @@ def update_inventory(inventory_id):
     # Attempt to find the Inventory and abort if not found
     inventory = Inventory.find(inventory_id)
     if not inventory:
-        abort(status.HTTP_404_NOT_FOUND, f"Inventory with id '{id}' was not found.")
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Inventory with id '{inventory_id}' was not found.",
+        )
 
     # Update the Inventory with the new data
     data = request.get_json()
@@ -171,7 +177,7 @@ def delete_inventory(inventory_id):
 
     try:
         inventory.delete()
-        app.logger.info(f"Inventory with id {id} has deleted successfully.")
+        app.logger.info(f"Inventory with id {inventory_id} has deleted successfully.")
         return "", status.HTTP_204_NO_CONTENT
     except DataValidationError as e:
         app.logger.error(f"Error deleting inventory: {str(e)}")
