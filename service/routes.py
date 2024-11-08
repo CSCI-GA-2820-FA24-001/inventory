@@ -201,3 +201,41 @@ def check_content_type(content_type) -> None:
         status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
         f"Content-Type must be {content_type}",
     )
+
+
+@app.route("/inventory/<int:inventory_id>/restock/<path:quantity>", methods=["PUT"])
+def restock_inventory(inventory_id, quantity):
+    """Restock an Inventory item (Can be negative)"""
+    app.logger.info(
+        "Request to restock [%s] count of inventory with id [%s]",
+        quantity,
+        inventory_id,
+    )
+    try:
+        quantity = int(quantity)
+    except ValueError:
+        abort(status.HTTP_400_BAD_REQUEST, f"'{quantity}' is not a valid integer.")
+    # Attempt to find the Inventory and abort if not found
+    inventory = Inventory.find(inventory_id)
+    if not inventory:
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Inventory with id '{inventory_id}' was not found.",
+        )
+
+    new_quantity = inventory.quantity + quantity
+    if new_quantity < 0:
+        abort(
+            status.HTTP_400_BAD_REQUEST,
+            f"Restocking by {quantity}: resulting quantity would be negative.",
+        )
+
+    inventory.quantity = new_quantity
+
+    # Save the updates to the database
+    inventory.update()
+
+    app.logger.info(
+        "Inventory with ID: %d restock by %d count.", inventory_id, quantity
+    )
+    return jsonify(inventory.serialize()), status.HTTP_200_OK

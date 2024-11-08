@@ -405,6 +405,46 @@ class TestInventoryService(TestCase):
                 inspect(actual_call)
             ), f"Expected {expected_call}, but got {actual_call}"
 
+    def test_restock(self):
+        """It should Restock an inventory by [quantity]"""
+        test_inventory = self._create_inventory()[0]
+        test_id = test_inventory.id
+        test_quantity = test_inventory.quantity
+
+        # positive quantity
+        response = self.client.put(f"{BASE_URL}/{test_id}/restock/1")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(data["quantity"], test_quantity + 1)
+
+        # negative & valid quantity
+        response = self.client.put(f"{BASE_URL}/{test_id}/restock/-1")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(data["quantity"], test_quantity)
+
+    def test_restock_bad_quantity(self):
+        """It should not Restock an inventory with bad quantity data"""
+        test_inventory = self._create_inventory()[0]
+        test_id = test_inventory.id
+        response = self.client.put(
+            f"{BASE_URL}/{test_id}/restock/-10001"
+        )  # max for factory is 10000
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+        response = self.client.put(
+            f"{BASE_URL}/{test_id}/restock/X"
+        )  # invalid quantity
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_restock_bad_id(self):
+        """It should not Restock an inventory with bad quantity data"""
+        test_id = 5  # not existing id in db
+        response = self.client.put(
+            f"{BASE_URL}/{test_id}/restock/1"
+        )  # max for factory is 10000
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
 
 ######################################################################
 #  T E S T   S A D   P A T H S
