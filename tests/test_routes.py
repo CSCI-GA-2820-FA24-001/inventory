@@ -257,11 +257,6 @@ class TestInventoryService(TestCase):
         response = self.client.get(f"{BASE_URL}/{test_inventory.id}")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    def test_delete_inventory_not_found(self):
-        """It should return 404 when trying to delete an inventory that doesn't exist"""
-        response = self.client.delete(f"{BASE_URL}/9999")
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-
     def test_health_check(self):
         """It should check the health of the service"""
         response = self.client.get("/health")

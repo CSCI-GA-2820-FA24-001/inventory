@@ -166,7 +166,6 @@ def update_inventory(inventory_id):
     return jsonify(inventory.serialize()), status.HTTP_200_OK
 
 
-
 def check_content_type(content_type) -> None:
     """Checks that the media type is correct"""
     if "Content-Type" not in request.headers:
@@ -190,18 +189,20 @@ def check_content_type(content_type) -> None:
 def delete_inventory(inventory_id):
     """Delete an Inventory item"""
     app.logger.info(f"Attempting to delete inventory with id: {inventory_id}")
-    
     inventory = Inventory.find(inventory_id)
-
     if inventory is not None:
         try:
             inventory.delete()
-            app.logger.info(f"Inventory with id {inventory_id} has been deleted successfully.")
+            app.logger.info(
+                f"Inventory with id {inventory_id} has been deleted successfully."
+            )
         except DataValidationError as e:
             app.logger.error(f"Error deleting inventory: {str(e)}")
             return jsonify({"error": str(e)}), status.HTTP_400_BAD_REQUEST
     else:
-        app.logger.info(f"Inventory with id {inventory_id} not found; nothing to delete.")
+        app.logger.info(
+            f"Inventory with id {inventory_id} not found; nothing to delete."
+        )
 
     # Always return 204_NO_CONTENT
     return "", status.HTTP_204_NO_CONTENT
@@ -233,14 +234,10 @@ def restock_inventory(inventory_id, quantity):
             status.HTTP_400_BAD_REQUEST,
             f"Restocking by {quantity}: resulting quantity would be negative.",
         )
-
     inventory.quantity = new_quantity
-
     # Save the updates to the database
     inventory.update()
-
     app.logger.info(
         "Inventory with ID: %d restock by %d count.", inventory_id, quantity
     )
     return jsonify(inventory.serialize()), status.HTTP_200_OK
-=======
