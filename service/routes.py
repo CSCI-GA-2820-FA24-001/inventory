@@ -166,23 +166,6 @@ def update_inventory(inventory_id):
     return jsonify(inventory.serialize()), status.HTTP_200_OK
 
 
-@app.route("/inventory/<int:inventory_id>", methods=["DELETE"])
-def delete_inventory(inventory_id):
-    """Delete an Inventory item"""
-    app.logger.info(f"delete inventory with id: {inventory_id}")
-    inventory = Inventory.find(inventory_id)
-    if inventory is None:
-        app.logger.error(f"Inventory with id {inventory_id} not found.")
-        return jsonify({"error": "Inventory not found"}), status.HTTP_404_NOT_FOUND
-
-    try:
-        inventory.delete()
-        app.logger.info(f"Inventory with id {inventory_id} has deleted successfully.")
-        return "", status.HTTP_204_NO_CONTENT
-    except DataValidationError as e:
-        app.logger.error(f"Error deleting inventory: {str(e)}")
-        return jsonify({"error": str(e)}), status.HTTP_400_BAD_REQUEST
-
 
 def check_content_type(content_type) -> None:
     """Checks that the media type is correct"""
@@ -201,3 +184,63 @@ def check_content_type(content_type) -> None:
         status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
         f"Content-Type must be {content_type}",
     )
+
+
+@app.route("/inventory/<int:inventory_id>", methods=["DELETE"])
+def delete_inventory(inventory_id):
+    """Delete an Inventory item"""
+    app.logger.info(f"Attempting to delete inventory with id: {inventory_id}")
+    
+    inventory = Inventory.find(inventory_id)
+
+    if inventory is not None:
+        try:
+            inventory.delete()
+            app.logger.info(f"Inventory with id {inventory_id} has been deleted successfully.")
+        except DataValidationError as e:
+            app.logger.error(f"Error deleting inventory: {str(e)}")
+            return jsonify({"error": str(e)}), status.HTTP_400_BAD_REQUEST
+    else:
+        app.logger.info(f"Inventory with id {inventory_id} not found; nothing to delete.")
+
+    # Always return 204_NO_CONTENT
+    return "", status.HTTP_204_NO_CONTENT
+
+
+@app.route("/inventory/<int:inventory_id>/restock/<path:quantity>", methods=["PUT"])
+def restock_inventory(inventory_id, quantity):
+    """Restock an Inventory item (Can be negative)"""
+    app.logger.info(
+        "Request to restock [%s] count of inventory with id [%s]",
+        quantity,
+        inventory_id,
+    )
+    try:
+        quantity = int(quantity)
+    except ValueError:
+        abort(status.HTTP_400_BAD_REQUEST, f"'{quantity}' is not a valid integer.")
+    # Attempt to find the Inventory and abort if not found
+    inventory = Inventory.find(inventory_id)
+    if not inventory:
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Inventory with id '{inventory_id}' was not found.",
+        )
+
+    new_quantity = inventory.quantity + quantity
+    if new_quantity < 0:
+        abort(
+            status.HTTP_400_BAD_REQUEST,
+            f"Restocking by {quantity}: resulting quantity would be negative.",
+        )
+
+    inventory.quantity = new_quantity
+
+    # Save the updates to the database
+    inventory.update()
+
+    app.logger.info(
+        "Inventory with ID: %d restock by %d count.", inventory_id, quantity
+    )
+    return jsonify(inventory.serialize()), status.HTTP_200_OK
+=======
