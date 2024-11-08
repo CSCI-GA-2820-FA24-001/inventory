@@ -184,7 +184,27 @@ def check_content_type(content_type) -> None:
         status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
         f"Content-Type must be {content_type}",
     )
-<<<<<<< HEAD
+
+
+@app.route("/inventory/<int:inventory_id>", methods=["DELETE"])
+def delete_inventory(inventory_id):
+    """Delete an Inventory item"""
+    app.logger.info(f"Attempting to delete inventory with id: {inventory_id}")
+    
+    inventory = Inventory.find(inventory_id)
+
+    if inventory is not None:
+        try:
+            inventory.delete()
+            app.logger.info(f"Inventory with id {inventory_id} has been deleted successfully.")
+        except DataValidationError as e:
+            app.logger.error(f"Error deleting inventory: {str(e)}")
+            return jsonify({"error": str(e)}), status.HTTP_400_BAD_REQUEST
+    else:
+        app.logger.info(f"Inventory with id {inventory_id} not found; nothing to delete.")
+
+    # Always return 204_NO_CONTENT
+    return "", status.HTTP_204_NO_CONTENT
 
 
 @app.route("/inventory/<int:inventory_id>/restock/<path:quantity>", methods=["PUT"])
@@ -224,4 +244,3 @@ def restock_inventory(inventory_id, quantity):
     )
     return jsonify(inventory.serialize()), status.HTTP_200_OK
 =======
->>>>>>> melody
