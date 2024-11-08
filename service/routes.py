@@ -243,4 +243,3 @@ def restock_inventory(inventory_id, quantity):
         "Inventory with ID: %d restock by %d count.", inventory_id, quantity
     )
     return jsonify(inventory.serialize()), status.HTTP_200_OK
-=======
