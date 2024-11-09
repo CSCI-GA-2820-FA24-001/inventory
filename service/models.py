@@ -20,6 +20,7 @@ import logging
 from enum import Enum
 from retry import retry
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import and_
 
 # global variables for retry (must be int)
 RETRY_COUNT = int(os.environ.get("RETRY_COUNT", 5))
@@ -177,6 +178,19 @@ class Inventory(db.Model):
         """
         logger.info("Processing name query for %s ...", name)
         return cls.query.filter(cls.name == name)
+
+    @classmethod
+    def find_by_quantity_range(cls, min_qty, max_qty):
+        """Returns all Inventory within the give quantity range
+
+        Args:
+            min_qty (int): the minimum quantity of the Inventory you want to match
+            max_qty (int): the maximum quantity of the Inventory you want to match
+        """
+        logger.info(
+            "Processing quantity range query for [%d, %d] ...", min_qty, max_qty
+        )
+        return cls.query.filter(and_(cls.quantity >= min_qty, cls.quantity <= max_qty))
 
     @classmethod
     def find_by_condition(cls, condition):

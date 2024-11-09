@@ -88,41 +88,35 @@ def list_inventory():
     app.logger.info("Request to list all Inventory Items...")
     inventories = []
 
-    # Parse any arguments from the query string
+    # Parse query string parameters
     name = request.args.get("name")
-    quantity = request.args.get("quantity")
+    quantity_min = request.args.get("quantity_min")
+    quantity_max = request.args.get("quantity_max")
     condition = request.args.get("condition")
     stock_level = request.args.get("stock_level")
 
-    inventories = Inventory.all()
-
+    # Apply filtering based on query parameters
     if name:
-        app.logger.info("Filter by name")
-        inventories = [inventory for inventory in inventories if inventory.name == name]
-    if quantity:
-        app.logger.info("Filter by quantity")
-        inventories = [
-            inventory
-            for inventory in inventories
-            if inventory.quantity == int(quantity)
-        ]
-    if condition:
-        app.logger.info("Filter by condition")
-        inventories = [
-            inventory
-            for inventory in inventories
-            if inventory.condition.value == condition
-        ]
-    if stock_level:
-        app.logger.info("Filter by stock level")
-        inventories = [
-            inventory
-            for inventory in inventories
-            if inventory.stock_level.value == stock_level
-        ]
+        app.logger.info("Filtering by name: %s", name)
+        inventories = Inventory.find_by_name(name)
+    elif quantity_min or quantity_max:
+        app.logger.info(
+            f"Filtering by quantity range: [{quantity_min}, {quantity_max}]"
+        )
+        quantity_min = int(quantity_min) if quantity_min else 0
+        quantity_max = int(quantity_max) if quantity_max else float("inf")
+        inventories = Inventory.find_by_quantity_range(quantity_min, quantity_max)
+    elif condition:
+        app.logger.info("Filtering by condition: %s", condition)
+        inventories = Inventory.find_by_condition(condition)
+    elif stock_level:
+        app.logger.info("Filtering by stock level: %s", stock_level)
+        inventories = Inventory.find_by_stock_level(stock_level)
+    else:
+        inventories = Inventory.all()
 
-    results = [inventory.serialize() for inventory in inventories]
-    app.logger.info("Returning %d inventory item", len(results))
+    results = [i.serialize() for i in inventories]
+    app.logger.info("Returning %d inventory items", len(results))
     return jsonify(results), status.HTTP_200_OK
 
 
@@ -163,6 +157,36 @@ def update_inventory(inventory_id):
     inventory.update()
 
     app.logger.info("Inventory with ID: %d updated.", inventory_id)
+    return jsonify(inventory.serialize()), status.HTTP_200_OK
+
+
+@app.route("/inventory/<int:inventory_id>/status", methods=["PUT"])
+def update_inventory_status(inventory_id):
+    """Update the status of an Inventory item"""
+    app.logger.info(f"Request to update status of inventory with id {inventory_id}")
+    check_content_type("application/json")
+
+    # Attempt to find the Inventory and abort if not found
+    inventory = Inventory.find(inventory_id)
+    if not inventory:
+        abort(
+            status.HTTP_404_NOT_FOUND,
+            f"Inventory with id '{inventory_id}' was not found.",
+        )
+
+    # Get the new status from the request
+    data = request.get_json()
+    new_status = data.get("status")
+    if not new_status:
+        abort(status.HTTP_400_BAD_REQUEST, "Request must include 'status' field.")
+
+    # Update the inventory status and save the changes
+    inventory.status = new_status
+    inventory.update()
+
+    app.logger.info(
+        f"Inventory with id {inventory_id} updated with status {new_status}."
+    )
     return jsonify(inventory.serialize()), status.HTTP_200_OK
 
 
