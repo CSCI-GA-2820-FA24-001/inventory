@@ -57,11 +57,28 @@ It also includes methods for basic CRUD (Create, Read, Update, Delete) operation
 ### API Endpoints
 The routes.py file defines the endpoints for the Inventory API. Currently, placeholders are present, and further implementation is needed. The API endpoints include:
 
-- GET /inventory: List all inventory items
+- GET /inventory: List all inventory items, with optional query parameters for filtering based on item name, quantity range, condition, and stock level.
+  - Query Parameters
+    - `name`: Filter by inventory item name
+    - `quantity_min` and `quantity_max`: Filter items with quantities within a specified range
+    - `condition`: Filter by item condition (e.g., NEW, OPENBOX, USED)
+    - `stock_level`: Filter by stock level (e.g., IN_STOCK, LOW_STOCK, OUT_OF_STOCK)
+  - Example Usage
+    - Filter by name: `curl -X GET "http://localhost:5000/inventory?name=widget"`
+    - Filter by quantity range: `curl -X GET "http://localhost:5000/inventory?quantity_min=10&quantity_max=50"`
+    - Filter by condition: `curl -X GET "http://localhost:5000/inventory?condition=USED"`
+    - Filter by stock level: `curl -X GET "http://localhost:5000/inventory?stock_level=OUT_OF_STOCK"`    
 - POST /inventory: Create a new inventory item
-- GET /inventory/<id>: Retrieve a specific inventory item by ID
-- PUT /inventory/<id>: Update a specific inventory item by ID
-- DELETE /inventory/<id>: Delete a specific inventory item by ID
+- GET /inventory/\<id\>: Retrieve a specific inventory item by ID
+- PUT /inventory/\<id\>: Update a specific inventory item by ID
+- DELETE /inventory/\<id\>: Delete a specific inventory item by ID
+- PUT /inventory/\<id\>/restock/\<quantity\>: Adjust the stock quantity of a specific inventory item by adding or subtracting a specified quantity. Positive values increase the stock, while negative values decrease it, as long as the resulting quantity remains non-negative.
+  - Query Parameters
+    - `id`: The unique identifier of the inventory item to restock.
+    - `quantity`: The quantity to adjust for the inventory item. Positive values increase stock, while negative values decrease it.
+  - Example Usage
+    - To increase the stock of an item by 10 units: `curl -X PUT "http://localhost:5000/inventory/1/restock/10"`
+    - To decrease the stock of an item by 5 units (ensure it doesn’t make the quantity negative): `curl -X PUT "http://localhost:5000/inventory/1/restock/-5"`
 
 ### Setup and Usage
 1. Install dependencies.
