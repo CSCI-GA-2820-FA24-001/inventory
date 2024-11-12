@@ -61,6 +61,7 @@ jobs:
           DATABASE_URI: "postgresql+psycopg://postgres:pgs3cr3t@postgres:5432/testdb"
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v3.1.4
         with: 
           token: ${{ secrets.CODECOV_TOKEN }}
+          root_dir: ./ # Set root_dir to the root of your repository
