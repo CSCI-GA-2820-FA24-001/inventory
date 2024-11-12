@@ -29,7 +29,6 @@ from service.common import status
 from tests.factories import InventoryFactory
 from wsgi import app
 
-
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql+psycopg://postgres:postgres@localhost:5432/testdb"
 )
@@ -164,17 +163,6 @@ class TestInventoryService(TestCase):
         data = response.get_json()
         self.assertEqual(len(data), 1)
         self.assertEqual(data[0]["name"], inventory_items[0].name)
-
-    def test_get_inventory_by_quantity(self):
-        """It should get inventory by quantity"""
-        inventory_items = self._create_inventory(3)
-        response = self.client.get(
-            BASE_URL, query_string={"quantity": inventory_items[0].quantity}
-        )
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        data = response.get_json()
-        self.assertEqual(len(data), 1)
-        self.assertEqual(data[0]["quantity"], inventory_items[0].quantity)
 
     def test_get_inventory_by_condition(self):
         """It should get inventory by condition"""
@@ -373,6 +361,36 @@ class TestInventoryService(TestCase):
             assert str(inspect(expected_call)) == str(
                 inspect(actual_call)
             ), f"Expected {expected_call}, but got {actual_call}"
+
+    def test_get_inventory_by_quantity(self):
+        """It should get inventory by quantity range"""
+        inventory_items = self._create_inventory(10)
+        inventory_items = sorted(inventory_items, key=lambda i: i.quantity)
+
+        response = self.client.get(
+            BASE_URL,
+            query_string={
+                "quantity_min": inventory_items[4].quantity,
+                "quantity_max": inventory_items[7].quantity,
+            },
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(len(data), 4)
+
+        response = self.client.get(
+            BASE_URL, query_string={"quantity_min": inventory_items[4].quantity}
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(len(data), 6)
+
+        response = self.client.get(
+            BASE_URL, query_string={"quantity_max": inventory_items[7].quantity}
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(len(data), 8)
 
     def test_find_by_condition(self):
         """It should find an inventory item by condition"""
