@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: inventory
+  labels:
+    app: inventory
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 2
+      maxUnavailable: 0  
+  selector:
+    matchLabels:
+      app: inventory
+  template:
+    metadata:
+      labels:
+        app: inventory
+    spec:
+      restartPolicy: Always
+      containers:
+      - name: inventory
+        image: cluster-registry:5000/inventory:1.0
+        # image: hitcounter
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        env:
+          - name: DATABASE_URI
+            valueFrom:
+              secretKeyRef:
+                name: postgres-creds
+                key: database-uri
+        resources:
+          limits:
+            cpu: "0.50"
+            memory: "128Mi"
+          requests:
+            cpu: "0.20"
+            memory: "64Mi"
