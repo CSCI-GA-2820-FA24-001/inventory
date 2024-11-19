@@ -210,7 +210,6 @@ $(function () {
                 queryString += 'condition=' + condition
             }
         }
-        console.log(queryString)
         $("#flash_message").empty();
 
         let ajax = $.ajax({
