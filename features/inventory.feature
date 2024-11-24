@@ -36,7 +36,6 @@ Scenario: Search for Condition "NEW"
     And I should see "Monster" in the results
     And I should not see "iPad" in the results
 
-
 Scenario: Search for Stock Level "LOW_STOCK"
     When I visit the "Home Page"
     And I select "LOW_STOCK" in the "Stock Level" dropdown
@@ -46,3 +45,21 @@ Scenario: Search for Stock Level "LOW_STOCK"
     And I should not see "CocaCola" in the results
     And I should not see "Monster" in the results
     And I should not see "iPad" in the results
+
+Scenario: Restock an Inventory item by a positive amount
+    When I visit the "Home Page"
+    And I set the "Name" to "Monster"
+    And I press the "Search" button
+    And I set the "Restock" to "5"
+    And I press the "Restock" button
+    Then I should see the message "Success"
+    And I should see "15" in the "Quantity" field
+
+Scenario: Restock an Inventory item by a negative amount
+    When I visit the "Home Page"
+    And I set the "Name" to "iPad"
+    And I press the "Search" button
+    And I set the "Restock" to "-5"
+    And I press the "Restock" button
+    Then I should see the message "Success"
+    And I should see "10" in the "Quantity" field
