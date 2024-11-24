@@ -1,6 +1,6 @@
 Feature: The inventory service back-end
-    As a Pet Store Owner
-    I need a RESTful catalog service
+    As a Store Owner
+    I need a RESTful Inventory service
     So that I can keep track of all my inventory
 
 Background:
@@ -16,7 +16,7 @@ Scenario: The server is running
     Then I should see "Inventory Demo RESTful Service" in the title
     And I should not see "404 Not Found"
 
-Scenario: List all pets
+Scenario: List all Inventory
     When I visit the "Home Page"
     And I press the "Search" button
     Then I should see the message "Success"
@@ -25,3 +25,24 @@ Scenario: List all pets
     And I should see "Monster" in the results
     And I should see "iPad" in the results
     And I should not see "Pepsi" in the results
+
+Scenario: Search for Condition "NEW"
+    When I visit the "Home Page"
+    And I select "NEW" in the "Condition" dropdown
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should see "CocaCola" in the results
+    And I should see "Water" in the results
+    And I should see "Monster" in the results
+    And I should not see "iPad" in the results
+
+
+Scenario: Search for Stock Level "LOW_STOCK"
+    When I visit the "Home Page"
+    And I select "LOW_STOCK" in the "Stock Level" dropdown
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should see "Water" in the results
+    And I should not see "CocaCola" in the results
+    And I should not see "Monster" in the results
+    And I should not see "iPad" in the results
