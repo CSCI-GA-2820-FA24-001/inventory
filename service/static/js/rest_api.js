@@ -19,6 +19,7 @@ $(function () {
         $("#inventory_stock_level").val("");
         $("#inventory_quantity").val("");
         $("#inventory_condition").val("");
+        $("#inventory_restock").val("");
     }
 
     // Updates the flash message area
@@ -246,6 +247,33 @@ $(function () {
                 update_form_data(firstInventory)
             }
 
+            flash_message("Success")
+        });
+
+        ajax.fail(function(res){
+            flash_message(res.responseJSON.message)
+        });
+
+    });
+
+    // ****************************************
+    // Restock for a Inventory
+    // ****************************************
+    $("#restock-btn").click(function () {
+
+        let inventory_id = $("#inventory_id").val();
+        let restock_amount = $("#inventory_restock").val();
+        $("#flash_message").empty();
+
+        let ajax = $.ajax({
+            type: "PUT",
+            url: `/inventory/${inventory_id}/restock/${restock_amount}`,
+            contentType: "application/json",
+            data: ''
+        })
+
+        ajax.done(function(res){
+            update_form_data(res)
             flash_message("Success")
         });
 
