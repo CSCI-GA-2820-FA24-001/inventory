@@ -26,6 +26,17 @@ Scenario: List all Inventory
     And I should see "iPad" in the results
     And I should not see "Pepsi" in the results
 
+Scenario: Read an Inventory
+    When I visit the "Home Page"
+    And I set the "Name" to "Water"
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should see "Water" in the results
+    And I should not see "CocaCola" in the results
+    And I should not see "Monster" in the results
+    And I should not see "iPad" in the results
+    And I should not see "Pepsi" in the results
+
 Scenario: Search for Condition "NEW"
     When I visit the "Home Page"
     And I select "NEW" in the "Condition" dropdown
