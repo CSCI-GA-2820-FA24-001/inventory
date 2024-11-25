@@ -46,3 +46,26 @@ Scenario: Search for Stock Level "LOW_STOCK"
     And I should not see "CocaCola" in the results
     And I should not see "Monster" in the results
     And I should not see "iPad" in the results
+
+Scenario: Update Inventory
+    When I visit the "Home Page"
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should see "CocaCola" in the "Name" field
+    And I should see "0" in the "Quantity" field
+    And I should see "NEW" in the "Condition" field
+    And I should see "OUT_OF_STOCK" in the "Stock Level" field
+    When I copy the "ID" field 
+    And I change "Name" to "Coke"
+    And I change "Quantity" to "20"
+    And I select "OPENBOX" in the "Condition" dropdown
+    And I select "IN_STOCK" in the "Stock Level" dropdown
+    And I press the "Update" button
+    Then I should see the message "Success"
+    When I paste the "ID" field
+    And I press the "Retrieve" button
+    Then I should see the message "Success"
+    And I should see "Coke" in the "Name" field
+    And I should see "20" in the "Quantity" field
+    And I should see "OPENBOX" in the "Condition" field
+    And I should see "IN_STOCK" in the "Stock Level" field
