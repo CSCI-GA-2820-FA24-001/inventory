@@ -97,3 +97,17 @@ Scenario: Update Inventory
     And I should see "20" in the "Quantity" field
     And I should see "OPENBOX" in the "Condition" field
     And I should see "IN_STOCK" in the "Stock Level" field
+
+Scenario: Delete Inventory
+    When I visit the "Home Page"
+    And I press the "Search" button
+    Then I should see the message "Success"
+    And I should see "CocaCola" in the "Name" field
+    And I should see "0" in the "Quantity" field
+    And I should see "NEW" in the "Condition" field
+    And I should see "OUT_OF_STOCK" in the "Stock Level" field
+    When I copy the "ID" field
+    And I press the "Delete" button
+    Then I should see the message "Inventory has been Deleted!"
+    When I press the "Search" button
+    Then I should not see "CocaCola" in the results
