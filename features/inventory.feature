@@ -26,6 +26,21 @@ Scenario: List all Inventory
     And I should see "iPad" in the results
     And I should not see "Pepsi" in the results
 
+Scenario: Create an Inventory
+    When I visit the "Home Page"
+    And I set the "Name" to "Laptop"
+    And I set the "Quantity" to "30"
+    And I select "NEW" in the "Condition" dropdown
+    And I select "IN_STOCK" in the "Stock Level" dropdown
+    And I press the "Create" button
+    Then I should see the message "Success"
+    When I press the "Search" button
+    Then I should see the message "Success"
+    And I should see "Laptop" in the results
+    And I should see "30" in the "Quantity" field
+    And I should see "NEW" in the "Condition" field
+    And I should see "IN_STOCK" in the "Stock Level" field
+
 Scenario: Read an Inventory
     When I visit the "Home Page"
     And I set the "Name" to "Water"
