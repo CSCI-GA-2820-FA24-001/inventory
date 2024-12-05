@@ -1,3 +1,5 @@
+const BASE_URL = "/api/inventory"
+
 $(function () {
 
     // ****************************************
@@ -50,7 +52,7 @@ $(function () {
         
         let ajax = $.ajax({
             type: "POST",
-            url: "/inventory",
+            url: `${BASE_URL}`,
             contentType: "application/json",
             data: JSON.stringify(data),
         });
@@ -91,7 +93,7 @@ $(function () {
 
         let ajax = $.ajax({
                 type: "PUT",
-                url: `/inventory/${inventory_id}`,
+                url: `${BASE_URL}/${inventory_id}`,
                 contentType: "application/json",
                 data: JSON.stringify(data)
             })
@@ -119,7 +121,7 @@ $(function () {
 
         let ajax = $.ajax({
             type: "GET",
-            url: `/inventory/${inventory_id}`,
+            url: `${BASE_URL}/${inventory_id}`,
             contentType: "application/json",
             data: ''
         })
@@ -149,7 +151,7 @@ $(function () {
 
         let ajax = $.ajax({
             type: "DELETE",
-            url: `/inventory/${inventory_id}`,
+            url: `${BASE_URL}/${inventory_id}`,
             contentType: "application/json",
             data: '',
         })
@@ -215,7 +217,7 @@ $(function () {
 
         let ajax = $.ajax({
             type: "GET",
-            url: `/inventory?${queryString}`,
+            url: `${BASE_URL}?${queryString}`,
             contentType: "application/json",
             data: ''
         })
@@ -267,7 +269,7 @@ $(function () {
 
         let ajax = $.ajax({
             type: "PUT",
-            url: `/inventory/${inventory_id}/restock/${restock_amount}`,
+            url: `${BASE_URL}/${inventory_id}/restock/${restock_amount}`,
             contentType: "application/json",
             data: ''
         })
