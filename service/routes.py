@@ -177,20 +177,12 @@ class InventoryResource(Resource):
     @api.response(204, "Inventory deleted")
     def delete(self, inventory_id):
         """Delete an Inventory item"""
-        app.logger.info(f"Attempting to delete inventory with id: {inventory_id}")
+        app.logger.info(f"Request to delete inventory with id: {inventory_id}")
         inventory = Inventory.find(inventory_id)
-        if inventory is not None:
-            try:
-                inventory.delete()
-                app.logger.info(
-                    f"Inventory with id {inventory_id} has been deleted successfully."
-                )
-            except DataValidationError as e:
-                app.logger.error(f"Error deleting inventory: {str(e)}")
-                return jsonify({"error": str(e)}), status.HTTP_400_BAD_REQUEST
-        else:
+        if inventory:
+            inventory.delete()
             app.logger.info(
-                f"Inventory with id {inventory_id} not found; nothing to delete."
+                f"Inventory with id {inventory_id} has been deleted successfully."
             )
 
         # Always return 204_NO_CONTENT

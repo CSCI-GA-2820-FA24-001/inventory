@@ -229,6 +229,7 @@ class TestInventoryService(TestCase):
     # TEST DELETE
     def test_delete_inventory(self):
         """It should Delete an inventory item"""
+
         # First, create an inventory item
         test_inventory = self._create_inventory()[0]
         logging.debug("Created inventory with id %s", test_inventory.id)
