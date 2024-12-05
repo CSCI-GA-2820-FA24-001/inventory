@@ -20,8 +20,9 @@ and SQL database
 """
 import sys
 from flask import Flask
-from service import config
+from flask_restx import Api
 from service.common import log_handlers
+from service import config
 
 
 ############################################################
@@ -29,15 +30,17 @@ from service.common import log_handlers
 ############################################################
 def create_app():
     """Initialize the core application."""
+
     # Create Flask application
     app = Flask(__name__)
     app.config.from_object(config)
+    app.url_map.strict_slashes = False
 
     # Initialize Plugins
     # pylint: disable=import-outside-toplevel
     from service.models import db
-    db.init_app(app)
 
+    db.init_app(app)
     with app.app_context():
         # Dependencies require we import the routes AFTER the Flask app is created
         # pylint: disable=wrong-import-position, wrong-import-order, unused-import
@@ -57,7 +60,5 @@ def create_app():
         app.logger.info(70 * "*")
         app.logger.info("  S E R V I C E   R U N N I N G  ".center(70, "*"))
         app.logger.info(70 * "*")
-
-        app.logger.info("Service initialized!")
 
         return app
