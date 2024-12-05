@@ -25,7 +25,7 @@ from flask import jsonify, request, abort
 from flask import current_app as app  # Import Flask application
 from flask_restx import Api, Resource, fields, reqparse
 
-from service.models import Inventory, DataValidationError, StockLevel, Condition
+from service.models import Inventory, StockLevel, Condition
 from service.common import status  # HTTP Status Codes
 
 ######################################################################
