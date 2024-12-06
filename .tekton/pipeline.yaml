@@ -20,7 +20,7 @@ spec:
       description: Name of image to build
       name: IMAGE_NAME
       type: string
-    - default: 'https://cd-pipeline-hd2585-dev.apps.sandbox-m2.ll9k.p1.openshiftapps.com'
+    - default: 'https://inventory-hd2585-dev.apps.sandbox-m2.ll9k.p1.openshiftapps.com'
       description: The route to the application
       name: BASE_URL
       type: string
