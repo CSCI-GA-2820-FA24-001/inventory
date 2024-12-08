@@ -153,6 +153,11 @@ class TestInventoryService(TestCase):
         response = self.client.get(f"{BASE_URL}/1")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
+    def test_get_inventory_invalid_id(self):
+        """It should handle invalid id input with 400 error"""
+        response = self.client.get(f"{BASE_URL}/invalid_id")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
     def test_get_inventory_by_name(self):
         """It should get inventory by name"""
         inventory_items = self._create_inventory(3)
