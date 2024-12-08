@@ -135,6 +135,13 @@ class InventoryResource(Resource):
     def get(self, inventory_id):
         """Retrieve a single Inventory item"""
         app.logger.info("Request to Retrieve a Inventory with id [%s]", inventory_id)
+        try:
+            inventory_id = int(inventory_id)
+        except ValueError:
+            abort(
+                status.HTTP_400_BAD_REQUEST,
+                f"Invalid inventory id '{inventory_id}': must be an integer",
+            )
         inventory = Inventory.find(inventory_id)
         if not inventory:
             abort(
