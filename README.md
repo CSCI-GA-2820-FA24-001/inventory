@@ -86,8 +86,16 @@ The routes.py file defines the endpoints for the Inventory API. Currently, place
 2. Initialize the database using SQLAlchemy.
 3. Implement the REST API functionality in routes.py.
 
-License
-This project is licensed under the Apache License 2.0. See the LICENSE file for more details.
+### Steps to run application on a Kubernetes cluster
+
+1. Create a Kubernetes cluster using the make recipe `make cluster`
+2. Build the Docker image using the command `docker build -t inventory:latest .`
+3. Tag the Docker image using the command `docker tag inventory:latest cluster-registry:5000/inventory:latest`
+4. Push the Docker image to the local registry using the command `docker push cluster-registry:5000/inventory:latest` 
+Note: If the push fails, it is likely because your
+`/etc/hosts` file is not configured correctly. You can add the following line to your `/etc/hosts` file: `"127.0.0.1 cluster-registry"`
+1. Apply k8s manifests using the command `kubectl apply -f k8s/`
+2. Check the status of the pods using the command `kubectl get pods`. When both pods are in the `Running` state, the application is ready to use on `localhost:8080`
 
 ## License
 
