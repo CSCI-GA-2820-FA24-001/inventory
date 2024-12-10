@@ -119,7 +119,6 @@ inventory_args.add_argument(
 ######################################################################
 @api.route("/inventory/<inventory_id>")
 @api.param("inventory_id", "The Inventory identifier")
-@api.response(404, "Inventory not found")
 class InventoryResource(Resource):
     """
     InventoryResource class
@@ -131,6 +130,7 @@ class InventoryResource(Resource):
     """
 
     @api.doc("get_inventory")
+    @api.response(404, "Inventory not found")
     @api.marshal_with(inventory_model)
     def get(self, inventory_id):
         """Retrieve a single Inventory item"""
@@ -152,8 +152,8 @@ class InventoryResource(Resource):
         return inventory.serialize(), status.HTTP_200_OK
 
     @api.doc("update_inventory")
-    @api.response(404, "Pet not found")
-    @api.response(400, "The posted Pet data was not valid")
+    @api.response(404, "Inventory not found")
+    @api.response(400, "The posted Inventory data was not valid")
     @api.expect(inventory_model)
     @api.marshal_with(inventory_model)
     def put(self, inventory_id):
