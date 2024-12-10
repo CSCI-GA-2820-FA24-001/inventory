@@ -86,7 +86,7 @@ The routes.py file defines the endpoints for the Inventory API. Currently, place
 2. Initialize the database using SQLAlchemy.
 3. Implement the REST API functionality in routes.py.
 
-## Steps to run application on a Kubernetes cluster
+### Steps to run application on a Kubernetes cluster
 
 1. Create a Kubernetes cluster using the make recipe `make cluster`
 2. Build the Docker image using the command `docker build -t inventory:latest .`
